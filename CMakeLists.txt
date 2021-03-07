@@ -44,3 +44,6 @@ include_directories(googletest/googlemock/include)
 add_executable(${PROJECT_TESTS_NAME} ${PROJECT_TEST_SOURCES})
 target_link_libraries(${PROJECT_TESTS_NAME} PUBLIC gtest_main gmock_main)
 add_test(NAME ${PROJECT_TESTS_NAME} COMMAND ${PROJECT_TESTS_NAME})
+
+# Run tests after successfully building test executable
+add_custom_command(TARGET ${PROJECT_TESTS_NAME} POST_BUILD COMMAND ctest)
