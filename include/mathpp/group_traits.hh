@@ -440,21 +440,6 @@ namespace mpp
         : public std::true_type
     {};
 
-    // integral-domain structure
-
-    template <typename Tp, typename Op1, typename Op2>
-    struct is_integral_domain
-        : public std::false_type
-    {};
-
-    template <typename Tp, typename Op1, typename Op2>
-        requires std::is_arithmetic<Tp>::value && std::is_signed<Tp>::value
-            && std::is_base_of<operation,Op1>::value
-            && std::is_base_of<operation,Op2>::value
-    struct is_integral_domain
-        : public std::false_type
-    {};
-
     // skew-field structure
 
     template <typename Tp, typename Op1, typename Op2>
@@ -482,6 +467,27 @@ namespace mpp
             && is_abelian_group<Tp,Op1>::value
             && is_abelian_group<Tp,Op2>::value
     struct is_field
+        : public std::true_type
+    {};
+
+    // integral-domain structure
+
+    template <typename Tp, typename Op1, typename Op2>
+    struct is_integral_domain
+        : public std::false_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_field<Tp,Op1,Op2>::value
+    struct is_integral_domain
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires std::is_arithmetic<Tp>::value && std::is_signed<Tp>::value
+            && std::is_base_of<operation,Op1>::value
+            && std::is_base_of<operation,Op2>::value
+    struct is_integral_domain
         : public std::true_type
     {};
 
