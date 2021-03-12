@@ -1,12 +1,12 @@
 
 #include <type_traits>
 
-/* ************************************************************************** */
-// Definitions
-/* ************************************************************************** */
-
 namespace mpp
 {
+
+    /* ********************************************************************** */
+    // Definitions
+    /* ********************************************************************** */
 
     /* Operation tags ******************************************************* */
 
@@ -24,6 +24,18 @@ namespace mpp
     /* Ordering tags ******************************************************** */
 
     // TODO Ordering tags
+
+    /* Tag helpers ********************************************************** */
+
+    template <typename Tp, typename Op>
+    struct identity {
+        static Tp get();
+    };
+
+    template <typename Tp, typename Op>
+    struct inverse {
+        static Tp get(Tp const&);
+    };
 
     /* Axiom tags *********************************************************** */
 
@@ -223,674 +235,705 @@ namespace mpp
         : public std::false_type
     {};
 
+    /* ********************************************************************** */
+    // Specialization
+    /* ********************************************************************** */
+
+    /* Tag helpers ********************************************************** */
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+            && has_identity<Tp,op_add>::value
+    struct identity<Tp,op_add>
+    {
+        constexpr static Tp const& get() noexcept { return s_ident; }
+    private:
+        constexpr static Tp const s_ident = Tp{0};
+    };
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+            && has_identity<Tp,op_mul>::value
+    struct identity<Tp,op_mul>
+    {
+        constexpr static Tp const& get() noexcept { return s_ident; }
+    private:
+        constexpr static Tp const s_ident = Tp{1};
+    };
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+            && has_invertibility<Tp,op_add>::value
+    struct inverse<Tp,op_add>
+    {
+        static Tp get(Tp e) { return -e; }
+    };
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+            && has_invertibility<Tp,op_mul>::value
+    struct inverse<Tp,op_mul>
+    {
+        static Tp get(Tp e) { return 1/e; }
+    };
+
+    /* Axiom tags *********************************************************** */
+
+    template <typename Tp, typename Op>
+        requires std::is_arithmetic<Tp>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires std::is_arithmetic<Tp>::value
+    struct has_identity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires std::is_arithmetic<Tp>::value && std::is_signed<Tp>::value
+    struct has_invertibility<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires std::is_arithmetic<Tp>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires std::is_arithmetic<Tp>::value
+    struct has_commutativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+    struct has_left_distributivity<Tp,op_add,op_mul>
+        : public std::true_type
+    {};
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+    struct has_right_distributivity<Tp,op_add,op_mul>
+        : public std::true_type
+    {};
+
+    template <typename Tp>
+        requires has_left_distributivity<Tp,op_add,op_mul>::value
+            && has_right_distributivity<Tp,op_add,op_mul>::value
+    struct has_distributivity<Tp,op_add,op_mul>
+        : public std::true_type
+    {};
+
+    /* Group-like structure tags ******************************************** */
+
+    // semigroup structure
+
+    template <typename Tp, typename Op>
+        requires has_associativity<Tp,Op>::value
+    struct is_semigroupoid<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_semigroupoid<Tp,Op>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    // small-category structure
+
+    template <typename Tp, typename Op>
+        requires has_associativity<Tp,Op>::value
+            && has_identity<Tp,Op>::value
+    struct is_small_category<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_small_category<Tp,Op>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_small_category<Tp,Op>::value
+    struct has_identity<Tp,Op>
+        : public std::true_type
+    {};
+
+    // groupid structure
+
+    template <typename Tp, typename Op>
+        requires has_associativity<Tp,Op>::value
+            && has_identity<Tp,Op>::value
+            && has_invertibility<Tp,Op>::value
+    struct is_groupoid<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_groupoid<Tp,Op>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_groupoid<Tp,Op>::value
+    struct has_invertibility<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_groupoid<Tp,Op>::value
+    struct has_identity<Tp,Op>
+        : public std::true_type
+    {};
+
+    // magma structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+    struct is_magma<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_magma<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    // quasigroup structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+            && has_invertibility<Tp,Op>::value
+    struct is_quasigroup<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_quasigroup<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_quasigroup<Tp,Op>::value
+    struct has_invertibility<Tp,Op>
+        : public std::true_type
+    {};
+
+    // unary magma structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+            && has_identity<Tp,Op>::value
+    struct is_unary_magma<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_unary_magma<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_unary_magma<Tp,Op>::value
+    struct has_identity<Tp,Op>
+        : public std::true_type
+    {};
+
+    // loop structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+            && has_identity<Tp,Op>::value
+            && has_invertibility<Tp,Op>::value
+    struct is_loop<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_loop<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_loop<Tp,Op>::value
+    struct has_identity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_loop<Tp,Op>::value
+    struct has_invertibility<Tp,Op>
+        : public std::true_type
+    {};
+
+    // semigroup structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+            && has_associativity<Tp,Op>::value
+    struct is_semigroup<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_semigroup<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_semigroup<Tp,Op>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    // invertible semigroup structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+            && has_invertibility<Tp,Op>::value
+            && has_associativity<Tp,Op>::value
+    struct is_invertible_semigroup<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_invertible_semigroup<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_invertible_semigroup<Tp,Op>::value
+    struct has_invertibility<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_invertible_semigroup<Tp,Op>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    // monoid structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+            && has_identity<Tp,Op>::value
+            && has_associativity<Tp,Op>::value
+    struct is_monoid<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_monoid<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_monoid<Tp,Op>::value
+    struct has_identity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_monoid<Tp,Op>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    // commutative monoid structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+            && has_identity<Tp,Op>::value
+            && has_associativity<Tp,Op>::value
+            && has_commutativity<Tp,Op>::value
+    struct is_commutative_monoid<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_commutative_monoid<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_commutative_monoid<Tp,Op>::value
+    struct has_identity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_commutative_monoid<Tp,Op>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_commutative_monoid<Tp,Op>::value
+    struct has_commutativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    // group structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+            && has_identity<Tp,Op>::value
+            && has_invertibility<Tp,Op>::value
+            && has_associativity<Tp,Op>::value
+    struct is_group<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_group<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_group<Tp,Op>::value
+    struct has_identity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_group<Tp,Op>::value
+    struct has_invertibility<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_group<Tp,Op>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    // abelian group structure
+
+    template <typename Tp, typename Op>
+        requires has_closure<Tp,Op>::value
+            && has_identity<Tp,Op>::value
+            && has_invertibility<Tp,Op>::value
+            && has_associativity<Tp,Op>::value
+            && has_commutativity<Tp,Op>::value
+    struct is_abelian_group<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_abelian_group<Tp,Op>::value
+    struct has_closure<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_abelian_group<Tp,Op>::value
+    struct has_identity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_abelian_group<Tp,Op>::value
+    struct has_invertibility<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_abelian_group<Tp,Op>::value
+    struct has_associativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op>
+        requires is_abelian_group<Tp,Op>::value
+    struct has_commutativity<Tp,Op>
+        : public std::true_type
+    {};
+
+    /* Ring-like structure tags ********************************************* */
+
+    // semiring structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_distributivity<Tp,Op1,Op2>::value
+            && is_commutative_monoid<Tp,Op1>::value
+            && is_monoid<Tp,Op2>::value
+    struct is_semiring<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_semiring<Tp,Op1,Op2>::value
+    // struct has_distributivity<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_semiring<Tp,Op1,Op2>::value
+    // struct is_commutative_monoid<Tp,Op1>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_semiring<Tp,Op1,Op2>::value
+    // struct is_monoid<Tp,Op2>
+    //     : public std::true_type
+    // {};
+
+    // left-near-ring structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_left_distributivity<Tp,Op1,Op2>::value
+            && is_group<Tp,Op1>::value
+            && is_semigroup<Tp,Op2>::value
+    struct is_left_near_ring<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_left_near_ring<Tp,Op1,Op2>::value
+    // struct has_left_distributivity<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_left_near_ring<Tp,Op1,Op2>::value
+    // struct is_group<Tp,Op1>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_left_near_ring<Tp,Op1,Op2>::value
+    // struct is_semigroup<Tp,Op2>
+    //     : public std::true_type
+    // {};
+
+    // right-near-ring structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_right_distributivity<Tp,Op1,Op2>::value
+            && is_group<Tp,Op1>::value
+            && is_semigroup<Tp,Op2>::value
+    struct is_right_near_ring<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_right_near_ring<Tp,Op1,Op2>::value
+    // struct has_right_distributivity<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_right_near_ring<Tp,Op1,Op2>::value
+    // struct is_group<Tp,Op1>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_right_near_ring<Tp,Op1,Op2>::value
+    // struct is_semigroup<Tp,Op2>
+    //     : public std::true_type
+    // {};
+
+    // near-ring structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_distributivity<Tp,Op1,Op2>::value
+            && is_group<Tp,Op1>::value
+            && is_semigroup<Tp,Op2>::value
+    struct is_near_ring<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_near_ring<Tp,Op1,Op2>::value
+    // struct has_distributivity<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_near_ring<Tp,Op1,Op2>::value
+    // struct is_group<Tp,Op1>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_near_ring<Tp,Op1,Op2>::value
+    // struct is_semigroup<Tp,Op2>
+    //     : public std::true_type
+    // {};
+
+    // pseudo-ring structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_distributivity<Tp,Op1,Op2>::value
+            && is_abelian_group<Tp,Op1>::value
+            && is_semigroup<Tp,Op2>::value
+    struct is_pseudo_ring<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_pseudo_ring<Tp,Op1,Op2>::value
+    // struct has_distributivity<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_pseudo_ring<Tp,Op1,Op2>::value
+    // struct is_abelian_group<Tp,Op1>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_pseudo_ring<Tp,Op1,Op2>::value
+    // struct is_semigroup<Tp,Op2>
+    //     : public std::true_type
+    // {};
+
+    // ring structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_distributivity<Tp,Op1,Op2>::value
+            && is_abelian_group<Tp,Op1>::value
+            && is_monoid<Tp,Op2>::value
+    struct is_ring<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_ring<Tp,Op1,Op2>::value
+    // struct has_distributivity<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_ring<Tp,Op1,Op2>::value
+    // struct is_abelian_group<Tp,Op1>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_ring<Tp,Op1,Op2>::value
+    // struct is_monoid<Tp,Op2>
+    //     : public std::true_type
+    // {};
+
+    // commutative-ring structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_distributivity<Tp,Op1,Op2>::value
+            && is_abelian_group<Tp,Op1>::value
+            && is_commutative_monoid<Tp,Op2>::value
+    struct is_commutative_ring<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_commutative_ring<Tp,Op1,Op2>::value
+    // struct has_distributivity<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_commutative_ring<Tp,Op1,Op2>::value
+    // struct is_abelian_group<Tp,Op1>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_commutative_ring<Tp,Op1,Op2>::value
+    // struct is_commutative_monoid<Tp,Op2>
+    //     : public std::true_type
+    // {};
+
+    // skew-field structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_distributivity<Tp,Op1,Op2>::value
+            && is_abelian_group<Tp,Op1>::value
+            && is_group<Tp,Op2>::value
+    struct is_skew_field<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_skew_field<Tp,Op1,Op2>::value
+    // struct has_distributivity<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_skew_field<Tp,Op1,Op2>::value
+    // struct is_abelian_group<Tp,Op1>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_skew_field<Tp,Op1,Op2>::value
+    // struct is_group<Tp,Op2>
+    //     : public std::true_type
+    // {};
+
+    // field structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_distributivity<Tp,Op1,Op2>::value
+            && is_abelian_group<Tp,Op1>::value
+            && is_abelian_group<Tp,Op2>::value
+    struct is_field<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_field<Tp,Op1,Op2>::value
+    // struct has_distributivity<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_field<Tp,Op1,Op2>::value
+    // struct is_abelian_group<Tp,Op1>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_field<Tp,Op1,Op2>::value
+    // struct is_abelian_group<Tp,Op2>
+    //     : public std::true_type
+    // {};
+
+    /* Domain-like structure tags ******************************************* */
+
+    // // integral-domain structure
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires std::is_arithmetic<Tp>::value && std::is_signed<Tp>::value
+    // struct is_integral_domain<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
+    // template <typename Tp, typename Op1, typename Op2>
+    //     requires is_field<Tp,Op1,Op2>::value
+    // struct is_integral_domain<Tp,Op1,Op2>
+    //     : public std::true_type
+    // {};
+
 } // namespace mpp
-
-/* ************************************************************************** */
-// Specialization
-/* ************************************************************************** */
-
-/* Axiom tags *************************************************************** */
-
-template <typename Tp, typename Op>
-    requires std::is_base_of<mpp::operation,Op>::value
-        && std::is_arithmetic<Tp>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires std::is_base_of<mpp::operation,Op>::value
-        && std::is_arithmetic<Tp>::value
-struct mpp::has_identity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires std::is_base_of<mpp::operation,Op>::value
-        && std::is_arithmetic<Tp>::value && std::is_signed<Tp>::value
-struct mpp::has_invertibility<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires std::is_base_of<mpp::operation,Op>::value
-        && std::is_arithmetic<Tp>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires std::is_base_of<mpp::operation,Op>::value
-        && std::is_arithmetic<Tp>::value
-struct mpp::has_commutativity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp>
-    requires std::is_arithmetic<Tp>::value
-struct mpp::has_left_distributivity<Tp,mpp::op_add,mpp::op_mul>
-    : public std::true_type
-{};
-
-template <typename Tp>
-    requires std::is_arithmetic<Tp>::value
-struct mpp::has_right_distributivity<Tp,mpp::op_add,mpp::op_mul>
-    : public std::true_type
-{};
-
-template <typename Tp>
-    requires mpp::has_left_distributivity<Tp,mpp::op_add,mpp::op_mul>::value
-        && mpp::has_right_distributivity<Tp,mpp::op_add,mpp::op_mul>::value
-struct mpp::has_distributivity<Tp,mpp::op_add,mpp::op_mul>
-    : public std::true_type
-{};
-
-/* Group-like structure tags ************************************************ */
-
-// semigroup structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_associativity<Tp,Op>::value
-struct mpp::is_semigroupoid<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_semigroupoid<Tp,Op>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-// small-category structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_associativity<Tp,Op>::value
-        && mpp::has_identity<Tp,Op>::value
-struct mpp::is_small_category<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_small_category<Tp,Op>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_small_category<Tp,Op>::value
-struct mpp::has_identity<Tp,Op>
-    : public std::true_type
-{};
-
-// groupid structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_associativity<Tp,Op>::value
-        && mpp::has_identity<Tp,Op>::value
-        && mpp::has_invertibility<Tp,Op>::value
-struct mpp::is_groupoid<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_groupoid<Tp,Op>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_groupoid<Tp,Op>::value
-struct mpp::has_invertibility<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_groupoid<Tp,Op>::value
-struct mpp::has_identity<Tp,Op>
-    : public std::true_type
-{};
-
-// magma structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-struct mpp::is_magma<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_magma<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-// quasigroup structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-        && mpp::has_invertibility<Tp,Op>::value
-struct mpp::is_quasigroup<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_quasigroup<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_quasigroup<Tp,Op>::value
-struct mpp::has_invertibility<Tp,Op>
-    : public std::true_type
-{};
-
-// unary magma structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-        && mpp::has_identity<Tp,Op>::value
-struct mpp::is_unary_magma<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_unary_magma<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_unary_magma<Tp,Op>::value
-struct mpp::has_identity<Tp,Op>
-    : public std::true_type
-{};
-
-// loop structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-        && mpp::has_identity<Tp,Op>::value
-        && mpp::has_invertibility<Tp,Op>::value
-struct mpp::is_loop<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_loop<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_loop<Tp,Op>::value
-struct mpp::has_identity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_loop<Tp,Op>::value
-struct mpp::has_invertibility<Tp,Op>
-    : public std::true_type
-{};
-
-// semigroup structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-        && mpp::has_associativity<Tp,Op>::value
-struct mpp::is_semigroup<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_semigroup<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_semigroup<Tp,Op>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-// invertible semigroup structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-        && mpp::has_invertibility<Tp,Op>::value
-        && mpp::has_associativity<Tp,Op>::value
-struct mpp::is_invertible_semigroup<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_invertible_semigroup<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_invertible_semigroup<Tp,Op>::value
-struct mpp::has_invertibility<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_invertible_semigroup<Tp,Op>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-// monoid structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-        && mpp::has_identity<Tp,Op>::value
-        && mpp::has_associativity<Tp,Op>::value
-struct mpp::is_monoid<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_monoid<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_monoid<Tp,Op>::value
-struct mpp::has_identity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_monoid<Tp,Op>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-// commutative monoid structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-        && mpp::has_identity<Tp,Op>::value
-        && mpp::has_associativity<Tp,Op>::value
-        && mpp::has_commutativity<Tp,Op>::value
-struct mpp::is_commutative_monoid<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_commutative_monoid<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_commutative_monoid<Tp,Op>::value
-struct mpp::has_identity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_commutative_monoid<Tp,Op>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_commutative_monoid<Tp,Op>::value
-struct mpp::has_commutativity<Tp,Op>
-    : public std::true_type
-{};
-
-// group structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-        && mpp::has_identity<Tp,Op>::value
-        && mpp::has_invertibility<Tp,Op>::value
-        && mpp::has_associativity<Tp,Op>::value
-struct mpp::is_group<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_group<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_group<Tp,Op>::value
-struct mpp::has_identity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_group<Tp,Op>::value
-struct mpp::has_invertibility<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_group<Tp,Op>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-// abelian group structure
-
-template <typename Tp, typename Op>
-    requires mpp::has_closure<Tp,Op>::value
-        && mpp::has_identity<Tp,Op>::value
-        && mpp::has_invertibility<Tp,Op>::value
-        && mpp::has_associativity<Tp,Op>::value
-        && mpp::has_commutativity<Tp,Op>::value
-struct mpp::is_abelian_group<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_abelian_group<Tp,Op>::value
-struct mpp::has_closure<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_abelian_group<Tp,Op>::value
-struct mpp::has_identity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_abelian_group<Tp,Op>::value
-struct mpp::has_invertibility<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_abelian_group<Tp,Op>::value
-struct mpp::has_associativity<Tp,Op>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op>
-    requires mpp::is_abelian_group<Tp,Op>::value
-struct mpp::has_commutativity<Tp,Op>
-    : public std::true_type
-{};
-
-/* Ring-like structure tags ************************************************* */
-
-// semiring structure
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::has_distributivity<Tp,Op1,Op2>::value
-        && mpp::is_commutative_monoid<Tp,Op1>::value
-        && mpp::is_monoid<Tp,Op2>::value
-struct mpp::is_semiring<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_semiring<Tp,Op1,Op2>::value
-struct mpp::has_distributivity<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_semiring<Tp,Op1,Op2>::value
-struct mpp::is_commutative_monoid<Tp,Op1>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_semiring<Tp,Op1,Op2>::value
-struct mpp::is_monoid<Tp,Op2>
-    : public std::true_type
-{};
-
-// left-near-ring structure
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::has_left_distributivity<Tp,Op1,Op2>::value
-        && mpp::is_group<Tp,Op1>::value
-        && mpp::is_semigroup<Tp,Op2>::value
-struct mpp::is_left_near_ring<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_left_near_ring<Tp,Op1,Op2>::value
-struct mpp::has_left_distributivity<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_left_near_ring<Tp,Op1,Op2>::value
-struct mpp::is_group<Tp,Op1>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_left_near_ring<Tp,Op1,Op2>::value
-struct mpp::is_semigroup<Tp,Op2>
-    : public std::true_type
-{};
-
-// right-near-ring structure
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::has_right_distributivity<Tp,Op1,Op2>::value
-        && mpp::is_group<Tp,Op1>::value
-        && mpp::is_semigroup<Tp,Op2>::value
-struct mpp::is_right_near_ring<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_right_near_ring<Tp,Op1,Op2>::value
-struct mpp::has_right_distributivity<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_right_near_ring<Tp,Op1,Op2>::value
-struct mpp::is_group<Tp,Op1>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_right_near_ring<Tp,Op1,Op2>::value
-struct mpp::is_semigroup<Tp,Op2>
-    : public std::true_type
-{};
-
-// near-ring structure
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::has_distributivity<Tp,Op1,Op2>::value
-        && mpp::is_group<Tp,Op1>::value
-        && mpp::is_semigroup<Tp,Op2>::value
-struct mpp::is_near_ring<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_near_ring<Tp,Op1,Op2>::value
-struct mpp::has_distributivity<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_near_ring<Tp,Op1,Op2>::value
-struct mpp::is_group<Tp,Op1>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_near_ring<Tp,Op1,Op2>::value
-struct mpp::is_semigroup<Tp,Op2>
-    : public std::true_type
-{};
-
-// pseudo-ring structure
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::has_distributivity<Tp,Op1,Op2>::value
-        && mpp::is_abelian_group<Tp,Op1>::value
-        && mpp::is_semigroup<Tp,Op2>::value
-struct mpp::is_pseudo_ring<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_pseudo_ring<Tp,Op1,Op2>::value
-struct mpp::has_distributivity<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_pseudo_ring<Tp,Op1,Op2>::value
-struct mpp::is_abelian_group<Tp,Op1>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_pseudo_ring<Tp,Op1,Op2>::value
-struct mpp::is_semigroup<Tp,Op2>
-    : public std::true_type
-{};
-
-// ring structure
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::has_distributivity<Tp,Op1,Op2>::value
-        && mpp::is_abelian_group<Tp,Op1>::value
-        && mpp::is_monoid<Tp,Op2>::value
-struct mpp::is_ring<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_ring<Tp,Op1,Op2>::value
-struct mpp::has_distributivity<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_ring<Tp,Op1,Op2>::value
-struct mpp::is_abelian_group<Tp,Op1>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_ring<Tp,Op1,Op2>::value
-struct mpp::is_monoid<Tp,Op2>
-    : public std::true_type
-{};
-
-// commutative-ring structure
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::has_distributivity<Tp,Op1,Op2>::value
-        && mpp::is_abelian_group<Tp,Op1>::value
-        && mpp::is_commutative_monoid<Tp,Op2>::value
-struct mpp::is_commutative_ring<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_commutative_ring<Tp,Op1,Op2>::value
-struct mpp::has_distributivity<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_commutative_ring<Tp,Op1,Op2>::value
-struct mpp::is_abelian_group<Tp,Op1>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_commutative_ring<Tp,Op1,Op2>::value
-struct mpp::is_commutative_monoid<Tp,Op2>
-    : public std::true_type
-{};
-
-// skew-field structure
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::has_distributivity<Tp,Op1,Op2>::value
-        && mpp::is_abelian_group<Tp,Op1>::value
-        && mpp::is_group<Tp,Op2>::value
-struct mpp::is_skew_field<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_skew_field<Tp,Op1,Op2>::value
-struct mpp::has_distributivity<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_skew_field<Tp,Op1,Op2>::value
-struct mpp::is_abelian_group<Tp,Op1>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_skew_field<Tp,Op1,Op2>::value
-struct mpp::is_group<Tp,Op2>
-    : public std::true_type
-{};
-
-// field structure
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::has_distributivity<Tp,Op1,Op2>::value
-        && mpp::is_abelian_group<Tp,Op1>::value
-        && mpp::is_abelian_group<Tp,Op2>::value
-struct mpp::is_field<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_field<Tp,Op1,Op2>::value
-struct mpp::has_distributivity<Tp,Op1,Op2>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_field<Tp,Op1,Op2>::value
-struct mpp::is_abelian_group<Tp,Op1>
-    : public std::true_type
-{};
-
-template <typename Tp, typename Op1, typename Op2>
-    requires mpp::is_field<Tp,Op1,Op2>::value
-struct mpp::is_abelian_group<Tp,Op2>
-    : public std::true_type
-{};
-
-/* Domain-like structure tags *********************************************** */
-
-// // integral-domain structure
-
-// template <typename Tp, typename Op1, typename Op2>
-//     requires std::is_arithmetic<Tp>::value && std::is_signed<Tp>::value
-//         && std::is_base_of<mpp::operation,Op1>::value
-//         && std::is_base_of<mpp::operation,Op2>::value
-// struct mpp::is_integral_domain<Tp,Op1,Op2>
-//     : public std::true_type
-// {};
-
-// template <typename Tp, typename Op1, typename Op2>
-//     requires mpp::is_field<Tp,Op1,Op2>::value
-// struct mpp::is_integral_domain<Tp,Op1,Op2>
-//     : public std::true_type
-// {};
