@@ -12,7 +12,7 @@ namespace mpp
 
     template <typename Tp>
     struct is_not
-        : public integral_constant<bool,!bool(Tp::value)>
+        : public std::integral_constant<bool,!bool(Tp::value)>
     {};
 
     /* Operation tags ******************************************************* */
