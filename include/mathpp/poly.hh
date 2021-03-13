@@ -81,12 +81,32 @@ namespace mpp
 /* Group traits ************************************************************* */
 
 template <typename Tp>
+    requires mpp::is_abelian_group<Tp,mpp::op_add>::value
 struct mpp::is_abelian_group<mpp::Poly<Tp>,mpp::op_add>
     : public std::true_type
 {};
 
 template <typename Tp>
+    requires mpp::is_commutative_monoid<Tp,mpp::op_mul>::value
 struct mpp::is_commutative_monoid<mpp::Poly<Tp>,mpp::op_mul>
+    : public std::true_type
+{};
+
+template <typename Tp>
+    requires mpp::is_abelian_group<Tp,mpp::op_mul>::value
+struct mpp::is_abelian_group<mpp::Poly<Tp>,mpp::op_mul>
+    : public std::true_type
+{};
+
+template <typename Tp>
+    requires mpp::is_field<Tp,mpp::op_add,mpp::op_mul>::value
+struct mpp::is_principal_ideal_domain<Tp,mpp::op_add,mpp::op_mul>
+    : public std::true_type
+{};
+
+template <typename Tp>
+    requires mpp::is_ring<Tp,mpp::op_add,mpp::op_mul>::value
+struct mpp::is_unique_factorisation_domain<Tp,mpp::op_add,mpp::op_mul>
     : public std::true_type
 {};
 
