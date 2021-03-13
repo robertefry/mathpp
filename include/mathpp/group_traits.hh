@@ -29,12 +29,12 @@ namespace mpp
 
     template <typename Tp, typename Op>
     struct identity {
-        static Tp get();
+        constexpr static Tp get();
     };
 
     template <typename Tp, typename Op>
     struct inverse {
-        static Tp get(Tp const&);
+        constexpr static Tp get(Tp const&);
     };
 
     /* Axiom tags *********************************************************** */
