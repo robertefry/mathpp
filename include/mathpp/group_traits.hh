@@ -277,6 +277,9 @@ namespace mpp
 // Specialization
 /* ************************************************************************** */
 
+// TODO Link ringlike traits with grouplike traits (find out how to XD)
+// (solve template dissimilarity problem)
+
 namespace mpp
 {
 
@@ -1018,8 +1021,6 @@ namespace mpp
     // struct has_nonzero_products<Tp,Op2>
     //     : public std::true_type
     // {};
-
-    // TODO: integrally-closed-domain structure
 
     // gcd-domain structure
 
