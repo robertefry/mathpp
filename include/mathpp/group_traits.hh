@@ -37,7 +37,7 @@ namespace mpp
         constexpr static Tp get(Tp const&);
     };
 
-    /* Axiom tags *********************************************************** */
+    /* Group-like axiom tags ************************************************ */
 
     template <typename Tp, typename Op>
     struct has_closure
@@ -61,21 +61,6 @@ namespace mpp
 
     template <typename Tp, typename Op>
     struct has_commutativity
-        : public std::false_type
-    {};
-
-    template <typename Tp, typename Op1, typename Op2>
-    struct has_left_distributivity
-        : public std::false_type
-    {};
-
-    template <typename Tp, typename Op1, typename Op2>
-    struct has_right_distributivity
-        : public std::false_type
-    {};
-
-    template <typename Tp, typename Op1, typename Op2>
-    struct has_distributivity
         : public std::false_type
     {};
 
@@ -143,6 +128,23 @@ namespace mpp
 
     template <typename Tp, typename Op>
     struct is_abelian_group
+        : public std::false_type
+    {};
+
+    /* Ring-like axiom tags ************************************************* */
+
+    template <typename Tp, typename Op1, typename Op2>
+    struct has_left_distributivity
+        : public std::false_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+    struct has_right_distributivity
+        : public std::false_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+    struct has_distributivity
         : public std::false_type
     {};
 
