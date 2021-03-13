@@ -678,11 +678,11 @@ namespace mpp
         : public std::true_type
     {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_semiring<Tp,Op1,Op2>::value
-    // struct has_distributivity<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_semiring<Tp,Op1,Op2>::value
+    struct has_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
     //     requires is_semiring<Tp,Op1,Op2>::value
@@ -706,11 +706,11 @@ namespace mpp
         : public std::true_type
     {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_left_near_ring<Tp,Op1,Op2>::value
-    // struct has_left_distributivity<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_left_near_ring<Tp,Op1,Op2>::value
+    struct has_left_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
     //     requires is_left_near_ring<Tp,Op1,Op2>::value
@@ -734,11 +734,11 @@ namespace mpp
         : public std::true_type
     {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_right_near_ring<Tp,Op1,Op2>::value
-    // struct has_right_distributivity<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_right_near_ring<Tp,Op1,Op2>::value
+    struct has_right_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
     //     requires is_right_near_ring<Tp,Op1,Op2>::value
@@ -762,11 +762,11 @@ namespace mpp
         : public std::true_type
     {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_near_ring<Tp,Op1,Op2>::value
-    // struct has_distributivity<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_near_ring<Tp,Op1,Op2>::value
+    struct has_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
     //     requires is_near_ring<Tp,Op1,Op2>::value
@@ -790,11 +790,11 @@ namespace mpp
         : public std::true_type
     {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_pseudo_ring<Tp,Op1,Op2>::value
-    // struct has_distributivity<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_pseudo_ring<Tp,Op1,Op2>::value
+    struct has_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
     //     requires is_pseudo_ring<Tp,Op1,Op2>::value
@@ -818,11 +818,11 @@ namespace mpp
         : public std::true_type
     {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_ring<Tp,Op1,Op2>::value
-    // struct has_distributivity<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_ring<Tp,Op1,Op2>::value
+    struct has_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
     //     requires is_ring<Tp,Op1,Op2>::value
@@ -846,11 +846,11 @@ namespace mpp
         : public std::true_type
     {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_commutative_ring<Tp,Op1,Op2>::value
-    // struct has_distributivity<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_commutative_ring<Tp,Op1,Op2>::value
+    struct has_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
     //     requires is_commutative_ring<Tp,Op1,Op2>::value
@@ -874,11 +874,11 @@ namespace mpp
         : public std::true_type
     {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_skew_field<Tp,Op1,Op2>::value
-    // struct has_distributivity<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_skew_field<Tp,Op1,Op2>::value
+    struct has_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
     //     requires is_skew_field<Tp,Op1,Op2>::value
@@ -902,11 +902,11 @@ namespace mpp
         : public std::true_type
     {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_field<Tp,Op1,Op2>::value
-    // struct has_distributivity<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_field<Tp,Op1,Op2>::value
+    struct has_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
     //     requires is_field<Tp,Op1,Op2>::value
