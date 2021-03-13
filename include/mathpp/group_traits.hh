@@ -1,12 +1,19 @@
 
 #include <type_traits>
 
+/* ************************************************************************** */
+// Definitions
+/* ************************************************************************** */
+
 namespace mpp
 {
 
-    /* ********************************************************************** */
-    // Definitions
-    /* ********************************************************************** */
+    /* Helper metatemplates ************************************************* */
+
+    template <typename Tp>
+    struct is_not
+        : public integral_constant<bool,!bool(Tp::value)>
+    {};
 
     /* Operation tags ******************************************************* */
 
@@ -65,6 +72,11 @@ namespace mpp
     {};
 
     /* Group-like structure tags ******************************************** */
+
+    template <typename Tp, typename Op>
+    struct is_trivial_grouplike
+        : public std::false_type
+    {};
 
     template <typename Tp, typename Op>
     struct is_semigroupoid
@@ -151,6 +163,11 @@ namespace mpp
     /* Ring-like structure tags ********************************************* */
 
     template <typename Tp, typename Op1, typename Op2>
+    struct is_trivial_ringlike
+        : public std::false_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
     struct is_semiring
         : public std::false_type
     {};
@@ -181,11 +198,6 @@ namespace mpp
     {};
 
     template <typename Tp, typename Op1, typename Op2>
-    struct is_trivial_ring
-        : public std::false_type
-    {};
-
-    template <typename Tp, typename Op1, typename Op2>
     struct is_commutative_ring
         : public std::false_type
     {};
@@ -200,6 +212,28 @@ namespace mpp
         : public std::false_type
     {};
 
+    /* Domain-like axiom tags *********************************************** */
+
+    template <typename Tp, typename Op>
+    struct has_nonzero_products
+        : public std::false_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+    struct has_gcd
+        : public std::false_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+    struct has_unique_factorisation
+        : public std::false_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+    struct has_principal_ideals
+        : public std::false_type
+    {};
+
     /* Domain-like structure tags ******************************************* */
 
     template <typename Tp, typename Op1, typename Op2>
@@ -207,10 +241,10 @@ namespace mpp
         : public std::false_type
     {};
 
-    template <typename Tp, typename Op1, typename Op2>
-    struct is_integrally_closed_domain
-        : public std::false_type
-    {};
+    // template <typename Tp, typename Op1, typename Op2>
+    // struct is_integrally_closed_domain
+    //     : public std::false_type
+    // {};
 
     template <typename Tp, typename Op1, typename Op2>
     struct is_gcd_domain
@@ -227,19 +261,24 @@ namespace mpp
         : public std::false_type
     {};
 
-    template <typename Tp, typename Op1, typename Op2>
-    struct is_euclidean_domain
-        : public std::false_type
-    {};
+    // template <typename Tp, typename Op1, typename Op2>
+    // struct is_euclidean_domain
+    //     : public std::false_type
+    // {};
 
-    template <typename Tp, typename Op1, typename Op2>
-    struct is_algebraically_closed_domain
-        : public std::false_type
-    {};
+    // template <typename Tp, typename Op1, typename Op2>
+    // struct is_algebraically_closed_domain
+    //     : public std::false_type
+    // {};
 
-    /* ********************************************************************** */
-    // Specialization
-    /* ********************************************************************** */
+} // namespace mpp
+
+/* ************************************************************************** */
+// Specialization
+/* ************************************************************************** */
+
+namespace mpp
+{
 
     /* Tag helpers ********************************************************** */
 
@@ -279,7 +318,7 @@ namespace mpp
         static Tp get(Tp e) { return 1/e; }
     };
 
-    /* Axiom tags *********************************************************** */
+    /* Group-like axiom tags ************************************************ */
 
     template <typename Tp, typename Op>
         requires std::is_arithmetic<Tp>::value
@@ -308,25 +347,6 @@ namespace mpp
     template <typename Tp, typename Op>
         requires std::is_arithmetic<Tp>::value
     struct has_commutativity<Tp,Op>
-        : public std::true_type
-    {};
-
-    template <typename Tp>
-        requires std::is_arithmetic<Tp>::value
-    struct has_left_distributivity<Tp,op_add,op_mul>
-        : public std::true_type
-    {};
-
-    template <typename Tp>
-        requires std::is_arithmetic<Tp>::value
-    struct has_right_distributivity<Tp,op_add,op_mul>
-        : public std::true_type
-    {};
-
-    template <typename Tp>
-        requires has_left_distributivity<Tp,op_add,op_mul>::value
-            && has_right_distributivity<Tp,op_add,op_mul>::value
-    struct has_distributivity<Tp,op_add,op_mul>
         : public std::true_type
     {};
 
@@ -668,6 +688,27 @@ namespace mpp
         : public std::true_type
     {};
 
+    /* Ring-like axiom tags ************************************************* */
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+    struct has_left_distributivity<Tp,op_add,op_mul>
+        : public std::true_type
+    {};
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+    struct has_right_distributivity<Tp,op_add,op_mul>
+        : public std::true_type
+    {};
+
+    template <typename Tp>
+        requires has_left_distributivity<Tp,op_add,op_mul>::value
+            && has_right_distributivity<Tp,op_add,op_mul>::value
+    struct has_distributivity<Tp,op_add,op_mul>
+        : public std::true_type
+    {};
+
     /* Ring-like structure tags ********************************************* */
 
     // semiring structure
@@ -922,20 +963,125 @@ namespace mpp
     //     : public std::true_type
     // {};
 
+    /* Domain-like axiom tags *********************************************** */
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value && std::is_signed<Tp>::value
+    struct has_nonzero_products<Tp,op_add>
+        : public std::true_type
+    {};
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+    struct has_nonzero_products<Tp,op_mul>
+        : public std::true_type
+    {};
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+    struct has_gcd<Tp,op_add,op_mul>
+        : public std::true_type
+    {};
+
+    template <typename Tp>
+        requires std::is_integral<Tp>::value
+    struct has_unique_factorisation<Tp,op_add,op_mul>
+        : public std::true_type
+    {};
+
+    template <typename Tp>
+        requires std::is_integral<Tp>::value
+    struct has_principal_ideals<Tp,op_add,op_mul>
+        : public std::true_type
+    {};
+
     /* Domain-like structure tags ******************************************* */
 
-    // // integral-domain structure
+    // integral-domain structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_commutative_ring<Tp,Op1,Op2>::value
+            && is_not<is_trivial_ringlike<Tp,Op1,Op2>>::value
+            && has_nonzero_products<Tp,Op2>::value
+    struct is_integral_domain<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_integral_domain<Tp,Op1,Op2>::value
+    struct is_commutative_ring<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     // template <typename Tp, typename Op1, typename Op2>
-    //     requires std::is_arithmetic<Tp>::value && std::is_signed<Tp>::value
-    // struct is_integral_domain<Tp,Op1,Op2>
+    //     requires is_integral_domain<Tp,Op1,Op2>::value
+    // struct has_nonzero_products<Tp,Op2>
     //     : public std::true_type
     // {};
 
-    // template <typename Tp, typename Op1, typename Op2>
-    //     requires is_field<Tp,Op1,Op2>::value
-    // struct is_integral_domain<Tp,Op1,Op2>
-    //     : public std::true_type
-    // {};
+    // TODO: integrally-closed-domain structure
+
+    // gcd-domain structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_integral_domain<Tp,Op1,Op2>::value
+            && has_gcd<Tp,Op1,Op2>::value
+    struct is_gcd_domain<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_gcd_domain<Tp,Op1,Op2>::value
+    struct is_integral_domain<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_gcd_domain<Tp,Op1,Op2>::value
+    struct has_gcd<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // unique-factorisation-domain structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_gcd_domain<Tp,Op1,Op2>::value
+            && has_unique_factorisation<Tp,Op1,Op2>::value
+    struct is_unique_factorisation_domain<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_unique_factorisation_domain<Tp,Op1,Op2>::value
+    struct is_gcd_domain<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_unique_factorisation_domain<Tp,Op1,Op2>::value
+    struct has_unique_factorisation<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    // principal-ideal-domain structure
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_unique_factorisation_domain<Tp,Op1,Op2>::value
+            && has_principal_ideals<Tp,Op1,Op2>::value
+    struct is_principal_ideal_domain<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_principal_ideal_domain<Tp,Op1,Op2>::value
+    struct is_unique_factorisation_domain<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_principal_ideal_domain<Tp,Op1,Op2>::value
+    struct has_principal_ideals<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
 } // namespace mpp
