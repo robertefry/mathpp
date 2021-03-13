@@ -2,6 +2,8 @@
 #ifndef __HH_MPP_POLY
 #define __HH_MPP_POLY
 
+#include "mathpp/group_traits.hh"
+
 #include <vector>
 #include <tuple>
 #include <algorithm>
@@ -75,6 +77,38 @@ namespace mpp
     auto divide_euclidean(mpp::Poly<Tp> const&, mpp::Poly<Tq> const&);
 
 } // namespace mpp
+
+/* Group traits ************************************************************* */
+
+template <typename Tp>
+struct mpp::is_abelian_group<mpp::Poly<Tp>,mpp::op_add>
+    : public std::true_type
+{};
+
+template <typename Tp>
+struct mpp::is_commutative_monoid<mpp::Poly<Tp>,mpp::op_mul>
+    : public std::true_type
+{};
+
+template <typename Tp>
+struct mpp::identity<mpp::Poly<Tp>,mpp::op_add>
+{
+    static mpp::Poly<Tp> const& get()
+    {
+        static mpp::Poly<Tp> s_ident = mpp::Poly<Tp>{mpp::identity<Tp,mpp::op_add>::get()};
+        return s_ident;
+    }
+};
+
+template <typename Tp>
+struct mpp::identity<mpp::Poly<Tp>,mpp::op_mul>
+{
+    static mpp::Poly<Tp> const& get()
+    {
+        static mpp::Poly<Tp> s_ident = mpp::Poly<Tp>{mpp::identity<Tp,mpp::op_mul>::get()};
+        return s_ident;
+    }
+};
 
 /* ************************************************************************** */
 // Implementation

@@ -79,6 +79,20 @@ TEST(MPP_POLY, LIFETIME)
     }
 }
 
+TEST(MPP_POLY, GROUP_TRAITS)
+{
+    {
+        auto poly1 = mpp::Poly<int>{0};
+        auto poly2 = mpp::identity<mpp::Poly<int>,mpp::op_add>::get();
+        EXPECT_TRUE(poly1 == poly2);
+    }
+    {
+        auto poly1 = mpp::Poly<int>{1};
+        auto poly2 = mpp::identity<mpp::Poly<int>,mpp::op_mul>::get();
+        EXPECT_TRUE(poly1 == poly2);
+    }
+}
+
 TEST(MPP_POLY, OPERATORS)
 {
     {
