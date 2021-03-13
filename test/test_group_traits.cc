@@ -2,6 +2,12 @@
 #include "gtest/gtest.h"
 #include <mathpp/group_traits.hh>
 
+TEST(GROUP_TRAITS, PRIMATIVES)
+{
+    auto is_gcd_domain = mpp::is_gcd_domain<int,mpp::op_add,mpp::op_mul>::value;
+    EXPECT_TRUE(is_gcd_domain);
+}
+
 struct TestType
 {};
 
