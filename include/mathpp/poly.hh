@@ -102,6 +102,10 @@ namespace mpp
         {
             return -e;
         }
+        static mpp::Poly<Tp>& make(mpp::Poly<Tp>& e)
+        {
+            return e *= -1;
+        }
     };
 
     template <typename Tp, typename Op>
@@ -109,9 +113,15 @@ namespace mpp
     {
         static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
         {
+            using identity = mpp::identity<mpp::Poly<Tp>,Op>;
             using inverse = mpp::inverse<mpp::Poly<Tp>,Op>;
-            static auto const s_ident = mpp::identity<mpp::Poly<Tp>,Op>::get();
-            return (e < s_ident) ? inverse::get(e) : e;
+            return (e < identity::get()) ? inverse::get(e) : e;
+        }
+        static mpp::Poly<Tp> make(mpp::Poly<Tp>& e)
+        {
+            using identity = mpp::identity<mpp::Poly<Tp>,Op>;
+            using inverse = mpp::inverse<mpp::Poly<Tp>,Op>;
+            return (e < identity::get()) ? inverse::make(e) : e;
         }
     };
 

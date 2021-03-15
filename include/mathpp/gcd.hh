@@ -35,7 +35,7 @@ Tp mpp::gcd(Tp const& a, Tp const& b)
         rn[0] %= rn[1];
         std::swap(rn[0],rn[1]);
     }
-    return mpp::absolute<Tp,op_add>::get(rn[0]);
+    return mpp::absolute<Tp,op_add>::make(rn[0]);
 }
 
 #endif /* __HH_MPP_GCD */

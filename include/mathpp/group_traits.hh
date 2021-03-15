@@ -50,11 +50,14 @@ namespace mpp
     struct inverse
     {
         // static Tp get(Tp const&);    <- expected in specializations
+        // static Tp& make(Tp&);        <- expected in specializations
     };
 
     template <typename Tp, typename Op>
-    struct absolute {
+    struct absolute
+    {
         // static Tp get(Tp const&);    <- expected in specializations
+        // static Tp& make(Tp&);        <- expected in specializations
     };
 
 } // namespace mpp
@@ -1024,6 +1027,7 @@ namespace mpp
     struct inverse<Tp,op_add>
     {
         static Tp get(Tp e) { return -e; }
+        static Tp& make(Tp& e) { return e = -e; }
     };
 
     template <typename Tp>
@@ -1032,6 +1036,7 @@ namespace mpp
     struct inverse<Tp,op_mul>
     {
         static Tp get(Tp e) { return 1/e; }
+        static Tp& make(Tp& e) { return e = 1/e; }
     };
 
     template <typename Tp, typename Op>
@@ -1039,6 +1044,7 @@ namespace mpp
     struct absolute<Tp,Op>
     {
         static Tp get(Tp e) { return (e < mpp::identity<Tp,Op>::get()) ? mpp::inverse<Tp,Op>::get(e) : e; }
+        static Tp& make(Tp& e) { return e = get(e); }
     };
 
 } // namespace mpp
