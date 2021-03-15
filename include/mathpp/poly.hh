@@ -58,6 +58,11 @@ namespace mpp
         Poly<Tp>& operator<<=(size_t);
         Poly<Tp>& operator>>=(size_t);
 
+        Poly<Tp>& operator+=(Tp const&);
+        Poly<Tp>& operator-=(Tp const&);
+        Poly<Tp>& operator*=(Tp const&);
+        Poly<Tp>& operator/=(Tp const&);
+
         template <typename Tq>
         Poly<Tp>& operator+=(Poly<Tq> const&);
         template <typename Tq>
@@ -268,6 +273,44 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator>>=(size_t n)
 }
 
 template <typename Tp>
+mpp::Poly<Tp>& mpp::Poly<Tp>::operator+=(Tp const& c)
+{
+    m_Coefficients[0] += c;
+    validate();
+    return *this;
+}
+
+template <typename Tp>
+mpp::Poly<Tp>& mpp::Poly<Tp>::operator-=(Tp const& c)
+{
+    m_Coefficients[0] -= c;
+    validate();
+    return *this;
+}
+
+template <typename Tp>
+mpp::Poly<Tp>& mpp::Poly<Tp>::operator*=(Tp const& c)
+{
+    for (Tp& coeff : m_Coefficients)
+    {
+        coeff *= c;
+    }
+    validate();
+    return *this;
+}
+
+template <typename Tp>
+mpp::Poly<Tp>& mpp::Poly<Tp>::operator/=(Tp const& c)
+{
+    for (Tp& coeff : m_Coefficients)
+    {
+        coeff /= c;
+    }
+    validate();
+    return *this;
+}
+
+template <typename Tp>
 template <typename Tq>
 mpp::Poly<Tp>& mpp::Poly<Tp>::operator+=(Poly<Tq> const& other)
 {
@@ -446,6 +489,80 @@ auto operator-(mpp::Poly<Tp> const& poly)
     for (auto const& coeff : poly.coeffs())
     {
         coeffs.push_back(Tp{}-coeff);
+    }
+    return mpp::Poly<Tr>{coeffs};
+}
+
+template <typename Tp>
+auto operator+(mpp::Poly<Tp> const& poly, Tp const& c)
+{
+    std::vector<Tp> coeffs = poly.coeffs();
+    coeffs[0] = coeffs[0] + c;
+    return mpp::Poly<Tp>{coeffs};
+}
+
+template <typename Tp>
+auto operator+(Tp const& c, mpp::Poly<Tp> const& poly)
+{
+    std::vector<Tp> coeffs = poly.coeffs();
+    coeffs[0] = c + coeffs[0];
+    return mpp::Poly<Tp>{coeffs};
+}
+
+template <typename Tp>
+auto operator-(mpp::Poly<Tp> const& poly, Tp const& c)
+{
+    std::vector<Tp> coeffs = poly.coeffs();
+    coeffs[0] = coeffs[0] - c;
+    return mpp::Poly<Tp>{coeffs};
+}
+
+template <typename Tp>
+auto operator-(Tp const& c, mpp::Poly<Tp> const& poly)
+{
+    std::vector<Tp> coeffs = poly.coeffs();
+    coeffs[0] = c - coeffs[0];
+    return mpp::Poly<Tp>{coeffs};
+}
+
+template <typename Tp>
+auto operator*(mpp::Poly<Tp> const& poly, Tp const& c)
+{
+    using Tr = decltype(poly[0]*c);
+    std::vector<Tr> coeffs;
+    coeffs.reserve(poly.size());
+
+    for (Tp const& coeff : poly)
+    {
+        coeffs.push_back(coeff*c);
+    }
+    return mpp::Poly<Tr>{coeffs};
+}
+
+template <typename Tp>
+auto operator*(Tp const& c, mpp::Poly<Tp> const& poly)
+{
+    using Tr = decltype(c*poly[0]);
+    std::vector<Tr> coeffs;
+    coeffs.reserve(poly.size());
+
+    for (Tp const& coeff : poly)
+    {
+        coeffs.push_back(c*coeff);
+    }
+    return mpp::Poly<Tr>{coeffs};
+}
+
+template <typename Tp>
+auto operator/(mpp::Poly<Tp> const& poly, Tp const& c)
+{
+    using Tr = decltype(poly[0]/c);
+    std::vector<Tr> coeffs;
+    coeffs.reserve(poly.size());
+
+    for (Tp const& coeff : poly)
+    {
+        coeffs.push_back(coeff/c);
     }
     return mpp::Poly<Tr>{coeffs};
 }
