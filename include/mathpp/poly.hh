@@ -80,25 +80,42 @@ namespace mpp
 
 /* Group traits ************************************************************* */
 
-template <typename Tp>
-struct mpp::identity<mpp::Poly<Tp>,mpp::op_add>
+namespace mpp
 {
-    static mpp::Poly<Tp> const& get()
-    {
-        static mpp::Poly<Tp> s_ident = mpp::Poly<Tp>{mpp::identity<Tp,mpp::op_add>::get()};
-        return s_ident;
-    }
-};
 
-template <typename Tp>
-struct mpp::identity<mpp::Poly<Tp>,mpp::op_mul>
-{
-    static mpp::Poly<Tp> const& get()
+    MPP_REQUIRE_EUCLIDEAN_DOMAIN(typename Tp,mpp::Poly<Tp>,op_add,op_mul,true);
+
+    template <typename Tp, typename Op>
+    struct identity<mpp::Poly<Tp>,Op>
     {
-        static mpp::Poly<Tp> s_ident = mpp::Poly<Tp>{mpp::identity<Tp,mpp::op_mul>::get()};
-        return s_ident;
-    }
-};
+        static mpp::Poly<Tp> const& get()
+        {
+            static mpp::Poly<Tp> s_ident = mpp::Poly<Tp>{identity<Tp,Op>::get()};
+            return s_ident;
+        }
+    };
+
+    template <typename Tp>
+    struct inverse<mpp::Poly<Tp>,op_add>
+    {
+        static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
+        {
+            return -e;
+        }
+    };
+
+    template <typename Tp, typename Op>
+    struct absolute<mpp::Poly<Tp>,Op>
+    {
+        static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
+        {
+            using inverse = mpp::inverse<mpp::Poly<Tp>,Op>;
+            static auto const s_ident = mpp::identity<mpp::Poly<Tp>,Op>::get();
+            return (e < s_ident) ? inverse::get(e) : e;
+        }
+    };
+
+} // namespace mpp
 
 /* ************************************************************************** */
 // Implementation
@@ -288,7 +305,8 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator/=(Poly<Tq> const& other)
 {
     mpp::Poly<Tp> quotient;
 
-    while (*this > other)
+    using abs = mpp::absolute<mpp::Poly<Tp>,op_add>;
+    while (abs::get(*this) >= abs::get(other))
     {
         auto const coeff = coeffs().back() / other.coeffs().back();
         auto const power = order() - other.order();
@@ -303,11 +321,13 @@ template <typename Tp>
 template <typename Tq>
 mpp::Poly<Tp>& mpp::Poly<Tp>::operator%=(Poly<Tq> const& other)
 {
-    while (*this > other)
+    using abs = mpp::absolute<mpp::Poly<Tp>,op_add>;
+    while (abs::get(*this) >= abs::get(other))
     {
         auto const coeff = coeffs().back() / other.coeffs().back();
         auto const power = order() - other.order();
-        *this -= other * (mpp::Poly<Tp>{coeff} >>= power);
+        auto const term = mpp::Poly<Tp>{coeff} >>= power;
+        *this -= other * term;
     }
     return *this;
 }
@@ -324,7 +344,8 @@ auto mpp::divide_euclidean(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly
     mpp::Poly<Tr> quotient;
     mpp::Poly<Ts> remainder = poly1;
 
-    while (remainder > poly2)
+    using abs = mpp::absolute<mpp::Poly<Tp>,op_add>;
+    while (abs::get(remainder) >= abs::get(poly2))
     {
         auto const coeff = remainder.coeffs().back() / poly2.coeffs().back();
         auto const power = remainder.order() - poly2.order();

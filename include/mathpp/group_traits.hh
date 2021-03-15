@@ -52,6 +52,11 @@ namespace mpp
         // static Tp get(Tp const&);    <- expected in specializations
     };
 
+    template <typename Tp, typename Op>
+    struct absolute {
+        // static Tp get(Tp const&);    <- expected in specializations
+    };
+
 } // namespace mpp
 
 /* ************************************************************************** */
@@ -1027,6 +1032,13 @@ namespace mpp
     struct inverse<Tp,op_mul>
     {
         static Tp get(Tp e) { return 1/e; }
+    };
+
+    template <typename Tp, typename Op>
+        requires std::is_arithmetic<Tp>::value
+    struct absolute<Tp,Op>
+    {
+        static Tp get(Tp e) { return (e < mpp::identity<Tp,Op>::get()) ? mpp::inverse<Tp,Op>::get(e) : e; }
     };
 
 } // namespace mpp
