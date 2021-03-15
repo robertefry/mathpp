@@ -358,33 +358,18 @@ bool operator==(mpp::Poly<Tp> const& poly1, mpp::Poly<Tp> const& poly2)
 }
 
 template <typename Tp, typename Tq>
-std::strong_ordering operator<=>(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
+std::compare_three_way_result_t<Tp,Tq> operator<=>(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 {
-    if (poly1.order() > poly2.order()) return std::strong_ordering::greater;
-    if (poly1.order() < poly2.order()) return std::strong_ordering::less;
+    if (poly1.order() > poly2.order()) return poly1.coeffs().back() <=> mpp::identity<Tp,mpp::op_add>::get();
+    if (poly1.order() < poly2.order()) return mpp::identity<Tp,mpp::op_add>::get() <=> poly2.coeffs().back();
 
     const size_t order = poly1.order();
     for (size_t i = order; i <= order; --i)
     {
-        if (poly1[i] > poly2[i]) return std::strong_ordering::greater;
-        if (poly1[i] < poly2[i]) return std::strong_ordering::less;
+        if (poly1[i] > poly2[i]) return std::compare_three_way_result_t<Tp,Tq>::greater;
+        if (poly1[i] < poly2[i]) return std::compare_three_way_result_t<Tp,Tq>::less;
     }
-    return std::strong_ordering::equivalent;
-}
-
-template <typename Tp>
-std::strong_ordering operator<=>(mpp::Poly<Tp> const& poly1, mpp::Poly<Tp> const& poly2)
-{
-    if (poly1.order() > poly2.order()) return std::strong_ordering::greater;
-    if (poly1.order() < poly2.order()) return std::strong_ordering::less;
-
-    const size_t order = poly1.order();
-    for (size_t i = order; i <= order; --i)
-    {
-        if (poly1[i] > poly2[i]) return std::strong_ordering::greater;
-        if (poly1[i] < poly2[i]) return std::strong_ordering::less;
-    }
-    return std::strong_ordering::equal;
+    return std::compare_three_way_result_t<Tp,Tq>::equivalent;
 }
 
 template <typename Tp>

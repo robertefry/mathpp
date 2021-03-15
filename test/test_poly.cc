@@ -97,6 +97,26 @@ TEST(MPP_POLY, OPERATORS)
 {
     {
         auto poly1 = mpp::Poly<int>{1,2,3};
+        auto poly2 = mpp::Poly<int>{2,3};
+        EXPECT_TRUE(poly1 != poly2);
+        EXPECT_TRUE(poly1 >= poly2);
+        EXPECT_TRUE(poly1 > poly2);
+        EXPECT_FALSE(poly1 == poly2);
+        EXPECT_FALSE(poly1 <= poly2);
+        EXPECT_FALSE(poly1 < poly2);
+    }
+    {
+        auto poly1 = mpp::Poly<int>{1,2,-3};
+        auto poly2 = mpp::Poly<int>{2,3};
+        EXPECT_TRUE(poly1 != poly2);
+        EXPECT_TRUE(poly1 <= poly2);
+        EXPECT_TRUE(poly1 < poly2);
+        EXPECT_FALSE(poly1 == poly2);
+        EXPECT_FALSE(poly1 >= poly2);
+        EXPECT_FALSE(poly1 > poly2);
+    }
+    {
+        auto poly1 = mpp::Poly<int>{1,2,3};
         auto poly2 = mpp::Poly<float>{1.0f,2.0f,3.0f};
         EXPECT_TRUE(poly1 == poly2);
         EXPECT_TRUE(poly1 >= poly2);
