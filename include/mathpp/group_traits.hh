@@ -41,12 +41,14 @@ namespace mpp
     /* Tag helpers ********************************************************** */
 
     template <typename Tp, typename Op>
-    struct identity {
+    struct identity
+    {
         // static Tp get();             <- expected in specializations
     };
 
     template <typename Tp, typename Op>
-    struct inverse {
+    struct inverse
+    {
         // static Tp get(Tp const&);    <- expected in specializations
     };
 
@@ -77,8 +79,8 @@ namespace mpp
         template <>\
         struct has_closure<TP,OP> : public std::true_type {};\
 
-    #define MPP_GIVE_CLOSURE_COND(TP,OP,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND)\
+        template <SPEC> requires COND\
         struct has_closure<TP,OP> : public std::true_type {};\
 
     // identity axiom
@@ -92,8 +94,8 @@ namespace mpp
         template <>\
         struct has_identity<TP,OP> : public std::true_type {};\
 
-    #define MPP_GIVE_IDENTITY_COND(TP,OP,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_IDENTITY_COND(SPEC,TP,OP,COND)\
+        template <SPEC> requires COND\
         struct has_identity<TP,OP> : public std::true_type {};\
 
     // invertibility axiom
@@ -107,8 +109,8 @@ namespace mpp
         template <>\
         struct has_invertibility<TP,OP> : public std::true_type {};\
 
-    #define MPP_GIVE_INVERTIBILITY_COND(TP,OP,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_INVERTIBILITY_COND(SPEC,TP,OP,COND)\
+        template <SPEC> requires COND\
         struct has_invertibility<TP,OP> : public std::true_type {};\
 
     // associativity axiom
@@ -122,8 +124,8 @@ namespace mpp
         template <>\
         struct has_associativity<TP,OP> : public std::true_type {};\
 
-    #define MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND)\
+        template <SPEC> requires COND\
         struct has_associativity<TP,OP> : public std::true_type {};\
 
     // commutativity axiom
@@ -137,8 +139,8 @@ namespace mpp
         template <>\
         struct has_commutativity<TP,OP> : public std::true_type {};\
 
-    #define MPP_GIVE_COMMUTATIVITY_COND(TP,OP,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_COMMUTATIVITY_COND(SPEC,TP,OP,COND)\
+        template <SPEC> requires COND\
         struct has_commutativity<TP,OP> : public std::true_type {};\
 
     /* Group-like structure tags ******************************************** */
@@ -154,8 +156,8 @@ namespace mpp
         template <>\
         struct is_trivial_grouplike<TP,OP> : public std::true_type {};\
 
-    #define MPP_REQUIRE_TRIVIAL_GROUP_COND(TP,OP,COND)\
-        template <typename TP> requires COND\
+    #define MPP_REQUIRE_TRIVIAL_GROUP_COND(SPEC,TP,OP,COND)\
+        template <SPEC> requires COND\
         struct is_trivial_grouplike<TP,OP> : public std::true_type {};\
 
     // semigroupoid structure
@@ -174,8 +176,8 @@ namespace mpp
     #define MPP_DEFINE_SEMIGROUPOID(TP,OP)\
         MPP_GIVE_ASSOCIATIVITY(TP,OP);\
 
-    #define MPP_REQUIRE_SEMIGROUPOID(TP,OP,COND)\
-        MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_SEMIGROUPOID(SPEC,TP,OP,COND)\
+        MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND);\
 
     // small-category structure
 
@@ -195,9 +197,9 @@ namespace mpp
         MPP_GIVE_IDENTITY(TP,OP);\
         MPP_GIVE_ASSOCIATIVITY(TP,OP);\
 
-    #define MPP_REQUIRE_SMALL_CATEGORY(TP,OP,COND)\
-        MPP_GIVE_IDENTITY_COND(TP,OP,COND);\
-        MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_SMALL_CATEGORY(SPEC,TP,OP,COND)\
+        MPP_GIVE_IDENTITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND);\
 
     // groupoid structure
 
@@ -219,10 +221,10 @@ namespace mpp
         MPP_GIVE_INVERTIBILITY(TP,OP);\
         MPP_GIVE_ASSOCIATIVITY(TP,OP);\
 
-    #define MPP_REQUIRE_GROUPOID(TP,OP,COND)\
-        MPP_GIVE_IDENTITY_COND(TP,OP,COND);\
-        MPP_GIVE_INVERTIBILITY_COND(TP,OP,COND);\
-        MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_GROUPOID(SPEC,TP,OP,COND)\
+        MPP_GIVE_IDENTITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_INVERTIBILITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND);\
 
     // magma structure
 
@@ -240,8 +242,8 @@ namespace mpp
     #define MPP_DEFINE_MAGMA(TP,OP)\
         MPP_GIVE_CLOSURE(TP,OP);\
 
-    #define MPP_REQUIRE_MAGMA(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_MAGMA(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
 
     // unary-magma structure
 
@@ -261,9 +263,9 @@ namespace mpp
         MPP_GIVE_CLOSURE(TP,OP);\
         MPP_GIVE_IDENTITY(TP,OP);\
 
-    #define MPP_REQUIRE_UNARY_MAGMA(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
-        MPP_GIVE_IDENTITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_UNARY_MAGMA(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_IDENTITY_COND(SPEC,TP,OP,COND);\
 
     // quasigroup structure
 
@@ -283,9 +285,9 @@ namespace mpp
         MPP_GIVE_CLOSURE(TP,OP);\
         MPP_GIVE_INVERTIBILITY(TP,OP);\
 
-    #define MPP_REQUIRE_QUASIGROUP(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
-        MPP_GIVE_INVERTIBILITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_QUASIGROUP(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_INVERTIBILITY_COND(SPEC,TP,OP,COND);\
 
     // loop structure
 
@@ -307,10 +309,10 @@ namespace mpp
         MPP_GIVE_IDENTITY(TP,OP);\
         MPP_GIVE_INVERTIBILITY(TP,OP);\
 
-    #define MPP_REQUIRE_LOOP(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
-        MPP_GIVE_IDENTITY_COND(TP,OP,COND);\
-        MPP_GIVE_INVERTIBILITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_LOOP(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_IDENTITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_INVERTIBILITY_COND(SPEC,TP,OP,COND);\
 
     // semigroup structure
 
@@ -330,9 +332,9 @@ namespace mpp
         MPP_GIVE_CLOSURE(TP,OP);\
         MPP_GIVE_ASSOCIATIVITY(TP,OP);\
 
-    #define MPP_REQUIRE_SEMIGROUP(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
-        MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_SEMIGROUP(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND);\
 
     // invertible-semigroup structure
 
@@ -354,10 +356,10 @@ namespace mpp
         MPP_GIVE_INVERTIBILITY(TP,OP);\
         MPP_GIVE_ASSOCIATIVITY(TP,OP);\
 
-    #define MPP_REQUIRE_INVERTIBLE_SEMIGROUP(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
-        MPP_GIVE_INVERTIBILITY_COND(TP,OP,COND);\
-        MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_INVERTIBLE_SEMIGROUP(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_INVERTIBILITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND);\
 
     // monoid structure
 
@@ -379,10 +381,10 @@ namespace mpp
         MPP_GIVE_IDENTITY(TP,OP);\
         MPP_GIVE_ASSOCIATIVITY(TP,OP);\
 
-    #define MPP_REQUIRE_MONOID(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
-        MPP_GIVE_IDENTITY_COND(TP,OP,COND);\
-        MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_MONOID(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_IDENTITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND);\
 
     // commutative-monoid structure
 
@@ -406,11 +408,11 @@ namespace mpp
         MPP_GIVE_ASSOCIATIVITY(TP,OP);\
         MPP_GIVE_COMMUTATIVITY(TP,OP);\
 
-    #define MPP_REQUIRE_COMMUTATIVE_MONOID(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
-        MPP_GIVE_IDENTITY_COND(TP,OP,COND);\
-        MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND);\
-        MPP_GIVE_COMMUTATIVITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_COMMUTATIVE_MONOID(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_IDENTITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_COMMUTATIVITY_COND(SPEC,TP,OP,COND);\
 
     // group strucure
 
@@ -434,11 +436,11 @@ namespace mpp
         MPP_GIVE_INVERTIBILITY(TP,OP);\
         MPP_GIVE_ASSOCIATIVITY(TP,OP);\
 
-    #define MPP_REQUIRE_GROUP(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
-        MPP_GIVE_IDENTITY_COND(TP,OP,COND);\
-        MPP_GIVE_INVERTIBILITY_COND(TP,OP,COND);\
-        MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_GROUP(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_IDENTITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_INVERTIBILITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND);\
 
     // abelian-group structure
 
@@ -464,12 +466,12 @@ namespace mpp
         MPP_GIVE_ASSOCIATIVITY(TP,OP);\
         MPP_GIVE_COMMUTATIVITY(TP,OP);\
 
-    #define MPP_REQUIRE_ABELIAN_GROUP(TP,OP,COND)\
-        MPP_GIVE_CLOSURE_COND(TP,OP,COND);\
-        MPP_GIVE_IDENTITY_COND(TP,OP,COND);\
-        MPP_GIVE_INVERTIBILITY_COND(TP,OP,COND);\
-        MPP_GIVE_ASSOCIATIVITY_COND(TP,OP,COND);\
-        MPP_GIVE_COMMUTATIVITY_COND(TP,OP,COND);\
+    #define MPP_REQUIRE_ABELIAN_GROUP(SPEC,TP,OP,COND)\
+        MPP_GIVE_CLOSURE_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_IDENTITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_INVERTIBILITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_ASSOCIATIVITY_COND(SPEC,TP,OP,COND);\
+        MPP_GIVE_COMMUTATIVITY_COND(SPEC,TP,OP,COND);\
 
     /* Ring-like axiom tags ************************************************* */
 
@@ -484,8 +486,8 @@ namespace mpp
         template <>\
         struct has_left_distributivity<TP,OP1,OP2> : public std::true_type {};\
 
-    #define MPP_GIVE_LEFT_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_LEFT_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND)\
+        template <SPEC> requires COND\
         struct has_left_distributivity<TP,OP1,OP2> : public std::true_type {};\
 
     // right-distributivity axiom
@@ -499,8 +501,8 @@ namespace mpp
         template <>\
         struct has_right_distributivity<TP,OP1,OP2> : public std::true_type {};\
 
-    #define MPP_GIVE_RIGHT_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_RIGHT_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND)\
+        template <SPEC> requires COND\
         struct has_right_distributivity<TP,OP1,OP2> : public std::true_type {};\
 
     // distributivity axiom
@@ -514,8 +516,8 @@ namespace mpp
         template <>\
         struct has_distributivity<TP,OP1,OP2> : public std::true_type {};\
 
-    #define MPP_GIVE_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND)\
+        template <SPEC> requires COND\
         struct has_distributivity<TP,OP1,OP2> : public std::true_type {};\
 
     /* Ring-like structure tags ********************************************* */
@@ -531,8 +533,8 @@ namespace mpp
         template <>\
         struct is_trivial_ringlike<TP,OP1,OP2> : public std::true_type {};\
 
-    #define MPP_REQUIRE_TRIVIAL_RINGLIKE(TP,OP1,OP2,COND)\
-        template <typename TP, typename OP1, typename OP2> requires COND\
+    #define MPP_REQUIRE_TRIVIAL_RINGLIKE(SPEC,TP,OP1,OP2,COND)\
+        template <SPEC> requires COND\
         struct is_trivial_ringlike<TP,OP1,OP2> : public std::true_type {};\
 
     // semiring structure
@@ -555,10 +557,10 @@ namespace mpp
         MPP_DEFINE_COMMUTATIVE_MONOID(TP,OP1);\
         MPP_DEFINE_MONOID(TP,OP2);\
 
-    #define MPP_REQUIRE_SEMIRING(TP,OP1,OP2,COND)\
-        MPP_GIVE_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND);\
-        MPP_REQUIRE_COMMUTATIVE_MONOID(TP,OP1,COND);\
-        MPP_REQUIRE_MONOID(TP,OP2,COND);\
+    #define MPP_REQUIRE_SEMIRING(SPEC,TP,OP1,OP2,COND)\
+        MPP_GIVE_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_REQUIRE_COMMUTATIVE_MONOID(SPEC,TP,OP1,COND);\
+        MPP_REQUIRE_MONOID(SPEC,TP,OP2,COND);\
 
     // left-near-ring structure
 
@@ -580,10 +582,10 @@ namespace mpp
         MPP_DEFINE_GROUP(TP,OP1);\
         MPP_DEFINE_SEMIGROUP(TP,OP2);\
 
-    #define MPP_REQUIRE_LEFT_NEAR_RING(TP,OP1,OP2,COND)\
-        MPP_GIVE_LEFT_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND);\
-        MPP_REQUIRE_GROUP(TP,OP1,COND);\
-        MPP_REQUIRE_SEMIGROUP(TP,OP2,COND);\
+    #define MPP_REQUIRE_LEFT_NEAR_RING(SPEC,TP,OP1,OP2,COND)\
+        MPP_GIVE_LEFT_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_REQUIRE_GROUP(SPEC,TP,OP1,COND);\
+        MPP_REQUIRE_SEMIGROUP(SPEC,TP,OP2,COND);\
 
     // right-near-ring structure
 
@@ -605,10 +607,10 @@ namespace mpp
         MPP_DEFINE_GROUP(TP,OP1);\
         MPP_DEFINE_SEMIGROUP(TP,OP2);\
 
-    #define MPP_REQUIRE_RIGHT_NEAR_RING(TP,OP1,OP2,COND)\
-        MPP_GIVE_RIGHT_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND);\
-        MPP_REQUIRE_GROUP(TP,OP1,COND);\
-        MPP_REQUIRE_SEMIGROUP(TP,OP2,COND);\
+    #define MPP_REQUIRE_RIGHT_NEAR_RING(SPEC,TP,OP1,OP2,COND)\
+        MPP_GIVE_RIGHT_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_REQUIRE_GROUP(SPEC,TP,OP1,COND);\
+        MPP_REQUIRE_SEMIGROUP(SPEC,TP,OP2,COND);\
 
     // near-ring structure
 
@@ -630,10 +632,10 @@ namespace mpp
         MPP_DEFINE_GROUP(TP,OP1);\
         MPP_DEFINE_SEMIGROUP(TP,OP2);\
 
-    #define MPP_REQUIRE_NEAR_RING(TP,OP1,OP2,COND)\
-        MPP_GIVE_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND);\
-        MPP_REQUIRE_GROUP(TP,OP1,COND);\
-        MPP_REQUIRE_SEMIGROUP(TP,OP2,COND);\
+    #define MPP_REQUIRE_NEAR_RING(SPEC,TP,OP1,OP2,COND)\
+        MPP_GIVE_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_REQUIRE_GROUP(SPEC,TP,OP1,COND);\
+        MPP_REQUIRE_SEMIGROUP(SPEC,TP,OP2,COND);\
 
     // pseudo-ring structure
 
@@ -655,10 +657,10 @@ namespace mpp
         MPP_DEFINE_ABELIAN_GROUP(TP,OP1);\
         MPP_DEFINE_SEMIGROUP(TP,OP2);\
 
-    #define MPP_REQUIRE_PSEUDO_RING(TP,OP1,OP2,COND)\
-        MPP_GIVE_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND);\
-        MPP_REQUIRE_ABELIAN_GROUP(TP,OP1,COND);\
-        MPP_REQUIRE_SEMIGROUP(TP,OP2,COND);\
+    #define MPP_REQUIRE_PSEUDO_RING(SPEC,TP,OP1,OP2,COND)\
+        MPP_GIVE_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_REQUIRE_ABELIAN_GROUP(SPEC,TP,OP1,COND);\
+        MPP_REQUIRE_SEMIGROUP(SPEC,TP,OP2,COND);\
 
     // ring structure
 
@@ -680,10 +682,10 @@ namespace mpp
         MPP_DEFINE_ABELIAN_GROUP(TP,OP1);\
         MPP_DEFINE_MONOID(TP,OP2);\
 
-    #define MPP_REQUIRE_RING(TP,OP1,OP2,COND)\
-        MPP_GIVE_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND);\
-        MPP_REQUIRE_ABELIAN_GROUP(TP,OP1,COND);\
-        MPP_REQUIRE_MONOID(TP,OP2,COND);\
+    #define MPP_REQUIRE_RING(SPEC,TP,OP1,OP2,COND)\
+        MPP_GIVE_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_REQUIRE_ABELIAN_GROUP(SPEC,TP,OP1,COND);\
+        MPP_REQUIRE_MONOID(SPEC,TP,OP2,COND);\
 
     // commutative-ring structure
 
@@ -705,10 +707,10 @@ namespace mpp
         MPP_DEFINE_ABELIAN_GROUP(TP,OP1);\
         MPP_DEFINE_COMMUTATIVE_MONOID(TP,OP2);\
 
-    #define MPP_REQUIRE_COMMUTATIVE_RING(TP,OP1,OP2,COND)\
-        MPP_GIVE_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND);\
-        MPP_REQUIRE_ABELIAN_GROUP(TP,OP1,COND);\
-        MPP_REQUIRE_COMMUTATIVE_MONOID(TP,OP2,COND);\
+    #define MPP_REQUIRE_COMMUTATIVE_RING(SPEC,TP,OP1,OP2,COND)\
+        MPP_GIVE_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_REQUIRE_ABELIAN_GROUP(SPEC,TP,OP1,COND);\
+        MPP_REQUIRE_COMMUTATIVE_MONOID(SPEC,TP,OP2,COND);\
 
     /* Domain-like axiom tags *********************************************** */
 
@@ -723,8 +725,8 @@ namespace mpp
         template <>\
         struct has_nonzero_products<TP,OP> : public std::true_type {};\
 
-    #define MPP_GIVE_NONZERO_PRODUCTS_COND(TP,OP,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_NONZERO_PRODUCTS_COND(SPEC,TP,OP,COND)\
+        template <SPEC> requires COND\
         struct has_nonzero_products<TP,OP> : public std::true_type {};\
 
     // zero-divisors axiom (tristate nonzero-products)
@@ -738,8 +740,8 @@ namespace mpp
         template <>\
         struct has_zero_divisors<TP,OP> : public std::true_type {};\
 
-    #define MPP_GIVE_ZERO_DIVISORS_COND(TP,OP,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_ZERO_DIVISORS_COND(SPEC,TP,OP,COND)\
+        template <SPEC> requires COND\
         struct has_zero_divisors<TP,OP> : public std::true_type {};\
 
     // has-gcd axiom
@@ -753,8 +755,8 @@ namespace mpp
         template <>\
         struct has_gcd<TP,OP1,OP2> : public std::true_type {};\
 
-    #define MPP_GIVE_GCD_COND(TP,OP1,OP2,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_GCD_COND(SPEC,TP,OP1,OP2,COND)\
+        template <SPEC> requires COND\
         struct has_gcd<TP,OP1,OP2> : public std::true_type {};\
 
     // has-unique-factorisation axiom
@@ -768,8 +770,8 @@ namespace mpp
         template <>\
         struct has_unique_factorisation<TP,OP1,OP2> : public std::true_type {};\
 
-    #define MPP_GIVE_UNIQUE_FACTORISATION_COND(TP,OP1,OP2,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_UNIQUE_FACTORISATION_COND(SPEC,TP,OP1,OP2,COND)\
+        template <SPEC> requires COND\
         struct has_unique_factorisation<TP,OP1,OP2> : public std::true_type {};\
 
     // has-principal-ideals axiom
@@ -783,8 +785,8 @@ namespace mpp
         template <>\
         struct has_principal_ideals<TP,OP1,OP2> : public std::true_type {};\
 
-    #define MPP_GIVE_PRINCIPAL_IDEALS_COND(TP,OP1,OP2,COND)\
-        template <typename TP> requires COND\
+    #define MPP_GIVE_PRINCIPAL_IDEALS_COND(SPEC,TP,OP1,OP2,COND)\
+        template <SPEC> requires COND\
         struct has_principal_ideals<TP,OP1,OP2> : public std::true_type {};\
 
     /* Domain-like structure tags ******************************************* */
@@ -809,22 +811,28 @@ namespace mpp
         MPP_DEFINE_COMMUTATIVE_RING(TP,OP1,OP2);\
         MPP_GIVE_NONZERO_PRODUCTS(TP,OP2);\
 
-    #define MPP_REQUIRE_INTEGRAL_DOMAIN(TP,OP1,OP2,COND)\
-        MPP_REQUIRE_COMMUTATIVE_RING(TP,OP1,OP2,COND);\
-        MPP_GIVE_NONZERO_PRODUCTS_COND(TP,OP2,COND);\
+    #define MPP_REQUIRE_INTEGRAL_DOMAIN(SPEC,TP,OP1,OP2,COND)\
+        MPP_REQUIRE_COMMUTATIVE_RING(SPEC,TP,OP1,OP2,COND);\
+        MPP_GIVE_NONZERO_PRODUCTS_COND(SPEC,TP,OP2,COND);\
 
     // intargrally-closed-domain structure
 
-    // template <typename Tp, typename Op1, typename Op2>
-    // struct is_integrally_closed_domain
-    //     : public std::false_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+    struct is_integrally_closed_domain
+        : public std::false_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_integral_domain<Tp,Op1,Op2>::value
+    struct is_integrally_closed_domain<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     #define MPP_DEFINE_INTEGRALLY_CLOSED_DOMAIN(TP,OP1,OP2)\
         MPP_DEFINE_INTEGRAL_DOMAIN(TP,OP1,OP2);\
 
-    #define MPP_REQUIRE_INTEGRALLY_CLOSED_DOMAIN(TP,OP1,OP2,COND)\
-        MPP_REQUIRE_INTEGRAL_DOMAIN(TP,OP1,OP2,COND);\
+    #define MPP_REQUIRE_INTEGRALLY_CLOSED_DOMAIN(SPEC,TP,OP1,OP2,COND)\
+        MPP_REQUIRE_INTEGRAL_DOMAIN(SPEC,TP,OP1,OP2,COND);\
 
     // gcd-domain structure
 
@@ -844,9 +852,9 @@ namespace mpp
         MPP_DEFINE_INTEGRALLY_CLOSED_DOMAIN(TP,OP1,OP2);\
         MPP_GIVE_GCD(TP,OP1,OP2);\
 
-    #define MPP_REQUIRE_GCD_DOMAIN(TP,OP1,OP2,COND)\
-        MPP_REQUIRE_INTEGRALLY_CLOSED_DOMAIN(TP,OP1,OP2,COND);\
-        MPP_GIVE_GCD_COND(TP,OP1,OP2,COND);\
+    #define MPP_REQUIRE_GCD_DOMAIN(SPEC,TP,OP1,OP2,COND)\
+        MPP_REQUIRE_INTEGRALLY_CLOSED_DOMAIN(SPEC,TP,OP1,OP2,COND);\
+        MPP_GIVE_GCD_COND(SPEC,TP,OP1,OP2,COND);\
 
     // unique-factorisation-domain structure
 
@@ -866,9 +874,9 @@ namespace mpp
         MPP_DEFINE_GCD_DOMAIN(TP,OP1,OP2);\
         MPP_GIVE_UNIQUE_FACTORISATION(TP,OP1,OP2);\
 
-    #define MPP_REQUIRE_UNIQUE_FACTORISATION_DOMAIN(TP,OP1,OP2,COND)\
-        MPP_REQUIRE_GCD_DOMAIN(TP,OP1,OP2,COND);\
-        MPP_GIVE_UNIQUE_FACTORISATION_COND(TP,OP1,OP2,COND);\
+    #define MPP_REQUIRE_UNIQUE_FACTORISATION_DOMAIN(SPEC,TP,OP1,OP2,COND)\
+        MPP_REQUIRE_GCD_DOMAIN(SPEC,TP,OP1,OP2,COND);\
+        MPP_GIVE_UNIQUE_FACTORISATION_COND(SPEC,TP,OP1,OP2,COND);\
 
     // principal-ideal-domain structure
 
@@ -888,22 +896,28 @@ namespace mpp
         MPP_DEFINE_UNIQUE_FACTORISATION_DOMAIN(TP,OP1,OP2);\
         MPP_GIVE_PRINCIPAL_IDEALS(TP,OP1,OP2);\
 
-    #define MPP_REQUIRE_PRINCIPAL_IDEAL_DOMAIN(TP,OP1,OP2,COND)\
-        MPP_REQUIRE_UNIQUE_FACTORISATION_DOMAIN(TP,OP1,OP2,COND);\
-        MPP_GIVE_PRINCIPAL_IDEALS_COND(TP,OP1,OP2,COND);\
+    #define MPP_REQUIRE_PRINCIPAL_IDEAL_DOMAIN(SPEC,TP,OP1,OP2,COND)\
+        MPP_REQUIRE_UNIQUE_FACTORISATION_DOMAIN(SPEC,TP,OP1,OP2,COND);\
+        MPP_GIVE_PRINCIPAL_IDEALS_COND(SPEC,TP,OP1,OP2,COND);\
 
     // euclidean-domain structure
 
-    // template <typename Tp, typename Op1, typename Op2>
-    // struct is_euclidean_domain
-    //     : public std::false_type
-    // {};
+    template <typename Tp, typename Op1, typename Op2>
+    struct is_euclidean_domain
+        : public std::false_type
+    {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires is_principal_ideal_domain<Tp,Op1,Op2>::value
+    struct is_euclidean_domain<Tp,Op1,Op2>
+        : public std::true_type
+    {};
 
     #define MPP_DEFINE_EUCLIDEAN_DOMAIN(TP,OP1,OP2)\
         MPP_DEFINE_PRINCIPAL_IDEAL_DOMAIN(TP,OP1,OP2);\
 
-    #define MPP_REQUIRE_EUCLIDEAN_DOMAIN(TP,OP1,OP2,COND)\
-        MPP_REQUIRE_PRINCIPAL_IDEAL_DOMAIN(TP,OP1,OP2,COND);\
+    #define MPP_REQUIRE_EUCLIDEAN_DOMAIN(SPEC,TP,OP1,OP2,COND)\
+        MPP_REQUIRE_PRINCIPAL_IDEAL_DOMAIN(SPEC,TP,OP1,OP2,COND);\
 
     /* Field-like structure tags ******************************************** */
 
@@ -927,10 +941,10 @@ namespace mpp
         MPP_DEFINE_ABELIAN_GROUP(TP,OP1);\
         MPP_DEFINE_GROUP(TP,OP2);\
 
-    #define MPP_REQUIRE_SKEW_FIELD(TP,OP1,OP2,COND)\
-        MPP_GIVE_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND);\
-        MPP_REQUIRE_ABELIAN_GROUP(TP,OP1,COND);\
-        MPP_REQUIRE_GROUP(TP,OP2,COND);\
+    #define MPP_REQUIRE_SKEW_FIELD(SPEC,TP,OP1,OP2,COND)\
+        MPP_GIVE_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_REQUIRE_ABELIAN_GROUP(SPEC,TP,OP1,COND);\
+        MPP_REQUIRE_GROUP(SPEC,TP,OP2,COND);\
 
     // field structure
 
@@ -957,15 +971,15 @@ namespace mpp
         MPP_GIVE_GCD(TP,OP1,OP2);\
         MPP_GIVE_NONZERO_PRODUCTS(TP,OP2);\
 
-    #define MPP_REQUIRE_FIELD(TP,OP1,OP2,COND)\
-        MPP_GIVE_DISTRIBUTIVITY_COND(TP,OP1,OP2,COND);\
-        MPP_REQUIRE_ABELIAN_GROUP(TP,OP1,COND);\
-        MPP_REQUIRE_ABELIAN_GROUP(TP,OP2,COND);\
-        /* MPP_REQUIRE_EUCLIDEAN_DOMAIN(TP,OP1,OP2,COND); */ \
-        MPP_GIVE_PRINCIPAL_IDEALS_COND(TP,OP1,OP2,COND);\
-        MPP_GIVE_UNIQUE_FACTORISATION_COND(TP,OP1,OP2,COND);\
-        MPP_GIVE_GCD_COND(TP,OP1,OP2,COND);\
-        MPP_GIVE_NONZERO_PRODUCTS_COND(TP,OP2,COND);\
+    #define MPP_REQUIRE_FIELD(SPEC,TP,OP1,OP2,COND)\
+        MPP_GIVE_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_REQUIRE_ABELIAN_GROUP(SPEC,TP,OP1,COND);\
+        MPP_REQUIRE_ABELIAN_GROUP(SPEC,TP,OP2,COND);\
+        /* MPP_REQUIRE_EUCLIDEAN_DOMAIN(SPEC,TP,OP1,OP2,COND); */ \
+        MPP_GIVE_PRINCIPAL_IDEALS_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_GIVE_UNIQUE_FACTORISATION_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_GIVE_GCD_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_GIVE_NONZERO_PRODUCTS_COND(SPEC,TP,OP2,COND);\
 
     // algebraically-closed-field structure
 
@@ -1023,8 +1037,8 @@ namespace mpp
 
 namespace mpp
 {
-    MPP_REQUIRE_FIELD(Tp,op_add,op_mul,std::is_floating_point<Tp>::value);
-    MPP_REQUIRE_GCD_DOMAIN(Tp,op_add,op_mul,std::is_integral<Tp>::value);
+    MPP_REQUIRE_FIELD(typename Tp,Tp,op_add,op_mul,std::is_floating_point<Tp>::value);
+    MPP_REQUIRE_GCD_DOMAIN(typename Tp,Tp,op_add,op_mul,std::is_integral<Tp>::value);
 
 } // namespace mpp
 
