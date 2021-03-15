@@ -26,14 +26,16 @@ template <typename Tp>
 Tp mpp::gcd(Tp const& a, Tp const& b)
 {
     if (a < b) return gcd(b,a);
-    Tp rn0 = a, rn1 = b;
 
-    while (rn1 != mpp::identity<Tp,mpp::op_add>::get())
+    using mpp::op_add;  using mpp::op_mul;
+    Tp rn[] = {a,b};
+
+    while (rn[1] != mpp::identity<Tp,op_add>::get())
     {
-        rn0 %= rn1;
-        std::swap(rn0,rn1);
+        rn[0] %= rn[1];
+        std::swap(rn[0],rn[1]);
     }
-    return mpp::absolute<Tp,mpp::op_add>::get(rn0);
+    return mpp::absolute<Tp,op_add>::get(rn[0]);
 }
 
 #endif /* __HH_MPP_GCD */
