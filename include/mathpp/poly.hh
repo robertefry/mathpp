@@ -88,7 +88,7 @@ namespace mpp
 namespace mpp
 {
 
-    MPP_REQUIRE_EUCLIDEAN_DOMAIN(typename Tp,mpp::Poly<Tp>,op_add,op_mul,true);
+    /* Tag helpers ********************************************************** */
 
     template <typename Tp, typename Op>
     struct identity<mpp::Poly<Tp>,Op>
@@ -129,6 +129,52 @@ namespace mpp
             return (e < identity::get()) ? inverse::make(e) : e;
         }
     };
+
+    /* Tag axioms *********************************************************** */
+
+    template <typename Tp, typename Op>
+        requires mpp::has_closure<Tp,Op>::value
+    struct has_closure<mpp::Poly<Tp>,Op> : public std::true_type {};
+
+    template <typename Tp, typename Op>
+        requires mpp::has_identity<Tp,Op>::value
+    struct has_identity<mpp::Poly<Tp>,Op> : public std::true_type {};
+
+    template <typename Tp>
+        requires mpp::has_invertibility<Tp,op_add>::value
+    struct has_invertibility<mpp::Poly<Tp>,op_add> : public std::true_type {};
+
+    template <typename Tp, typename Op>
+        requires mpp::has_associativity<Tp,Op>::value
+    struct has_associativity<mpp::Poly<Tp>,Op> : public std::true_type {};
+
+    template <typename Tp, typename Op>
+        requires mpp::has_commutativity<Tp,Op>::value
+    struct has_commutativity<mpp::Poly<Tp>,Op> : public std::true_type {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires mpp::has_left_distributivity<Tp,Op1,Op2>::value
+    struct has_left_distributivity<mpp::Poly<Tp>,Op1,Op2> : public std::true_type {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires mpp::has_right_distributivity<Tp,Op1,Op2>::value
+    struct has_right_distributivity<mpp::Poly<Tp>,Op1,Op2> : public std::true_type {};
+
+    template <typename Tp, typename Op>
+        requires mpp::has_nonzero_products<Tp,Op>::value
+    struct has_nonzero_products<mpp::Poly<Tp>,Op> : public std::true_type {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires mpp::has_gcd<Tp,Op1,Op2>::value
+    struct has_gcd<mpp::Poly<Tp>,Op1,Op2> : public std::true_type {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires mpp::has_unique_factorisation<Tp,Op1,Op2>::value
+    struct has_unique_factorisation<mpp::Poly<Tp>,Op1,Op2> : public std::true_type {};
+
+    template <typename Tp, typename Op1, typename Op2>
+        requires mpp::has_principal_ideals<Tp,Op1,Op2>::value
+    struct has_principal_ideals<mpp::Poly<Tp>,Op1,Op2> : public std::true_type {};
 
 } // namespace mpp
 
