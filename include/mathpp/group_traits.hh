@@ -520,13 +520,20 @@ namespace mpp
         : public std::false_type
     {};
 
+    template <typename Tp, typename Op1, typename Op2>
+        requires has_left_distributivity<Tp,Op1,Op2>::value
+            && has_right_distributivity<Tp,Op1,Op2>::value
+    struct has_distributivity<Tp,Op1,Op2>
+        : public std::true_type
+    {};
+
     #define MPP_GIVE_DISTRIBUTIVITY(TP,OP1,OP2)\
-        template <>\
-        struct has_distributivity<TP,OP1,OP2> : public std::true_type {};\
+        MPP_GIVE_LEFT_DISTRIBUTIVITY(TP,OP1,OP2);\
+        MPP_GIVE_RIGHT_DISTRIBUTIVITY(TP,OP1,OP2);\
 
     #define MPP_GIVE_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND)\
-        template <SPEC> requires COND\
-        struct has_distributivity<TP,OP1,OP2> : public std::true_type {};\
+        MPP_GIVE_LEFT_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
+        MPP_GIVE_RIGHT_DISTRIBUTIVITY_COND(SPEC,TP,OP1,OP2,COND);\
 
     /* Ring-like structure tags ********************************************* */
 
