@@ -78,9 +78,6 @@ namespace mpp
         std::vector<Tp> m_Coefficients{};
     };
 
-    template <typename Tp, typename Tq>
-    auto divide_euclidean(mpp::Poly<Tp> const&, mpp::Poly<Tq> const&);
-
 } // namespace mpp
 
 /* Group traits ************************************************************* */
@@ -127,6 +124,33 @@ namespace mpp
             using identity = mpp::identity<mpp::Poly<Tp>,Op>;
             using inverse = mpp::inverse<mpp::Poly<Tp>,Op>;
             return (e < identity::get()) ? inverse::make(e) : e;
+        }
+    };
+
+    template <typename Tp, typename Tq>
+    struct division<mpp::Poly<Tp>,mpp::Poly<Tq>>
+    {
+        static auto euclidean(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
+        {
+            using Tr = decltype(poly1[0]/poly2[0]);
+            using Ts = decltype(poly1[0]%poly2[0]);
+            mpp::Poly<Tr> quotient;
+            mpp::Poly<Ts> remainder = poly1;
+
+            using abs = mpp::absolute<mpp::Poly<Tp>,op_add>;
+            while (abs::get(remainder) >= abs::get(poly2))
+            {
+                auto const coeff = remainder.coeffs().back() / poly2.coeffs().back();
+                auto const power = remainder.order() - poly2.order();
+                auto const term = mpp::Poly<Tr>{coeff} >>= power;
+                quotient += term;
+                remainder -= term * poly2;
+            }
+            return std::tuple<mpp::Poly<Tr>,mpp::Poly<Ts>>{quotient,remainder};
+        }
+        static auto get(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
+        {
+            return euclidean(poly1,poly2);
         }
     };
 
@@ -432,30 +456,6 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator%=(Poly<Tq> const& other)
 }
 
 /* ************************************************************************** */
-// Namespace Extensions
-/* ************************************************************************** */
-
-template <typename Tp, typename Tq>
-auto mpp::divide_euclidean(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
-{
-    using Tr = decltype(poly1[0]/poly2[0]);
-    using Ts = decltype(poly1[0]%poly2[0]);
-    mpp::Poly<Tr> quotient;
-    mpp::Poly<Ts> remainder = poly1;
-
-    using abs = mpp::absolute<mpp::Poly<Tp>,op_add>;
-    while (abs::get(remainder) >= abs::get(poly2))
-    {
-        auto const coeff = remainder.coeffs().back() / poly2.coeffs().back();
-        auto const power = remainder.order() - poly2.order();
-        auto const term = mpp::Poly<Tr>{coeff} >>= power;
-        quotient += term;
-        remainder -= term * poly2;
-    }
-    return std::tuple<mpp::Poly<Tr>,mpp::Poly<Ts>>{quotient,remainder};
-}
-
-/* ************************************************************************** */
 // External Extensions
 /* ************************************************************************** */
 
@@ -681,15 +681,15 @@ auto operator*(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 template <typename Tp, typename Tq>
 auto operator/(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 {
-    auto result = mpp::divide_euclidean(poly1,poly2);
-    return std::get<0>(result);
+    using division = mpp::division<mpp::Poly<Tp>,mpp::Poly<Tq>>;
+    return std::get<0>(division::get(poly1,poly2));
 }
 
 template <typename Tp, typename Tq>
 auto operator%(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 {
-    auto result = mpp::divide_euclidean(poly1,poly2);
-    return std::get<1>(result);
+    using division = mpp::division<mpp::Poly<Tp>,mpp::Poly<Tq>>;
+    return std::get<1>(division::get(poly1,poly2));
 }
 
 /* ************************************************************************** */

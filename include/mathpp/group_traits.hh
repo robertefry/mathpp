@@ -53,6 +53,12 @@ namespace mpp
         // static Tp& make(Tp&);        <- expected in specializations
     };
 
+    template <typename Tp, typename Tq>
+    struct division
+    {
+        // static auto get(Tp const&, Tq const&);
+    };
+
     template <typename Tp, typename Op>
     struct absolute
     {
