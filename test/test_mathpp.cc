@@ -4,7 +4,7 @@
 
 using mpp::op_add;  using mpp::op_mul;
 
-TEST(GROUP_TRAITS, PRIMATIVES)
+TEST(MATHPP, PRIMATIVES)
 {
     {
         auto int_add_identity = mpp::identity<int,op_add>::get();
