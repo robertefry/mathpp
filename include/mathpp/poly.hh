@@ -25,6 +25,7 @@ namespace mpp
         Poly(std::vector<Tp> const&);
         Poly(std::vector<Tp>&&);
         Poly(std::initializer_list<Tp>);
+        virtual ~Poly() = default;
 
         template <typename Tq>
         Poly(Poly<Tq> const&);
@@ -34,34 +35,34 @@ namespace mpp
         template <typename Tq>
         Poly<Tp>& operator=(std::initializer_list<Tq>);
 
-    private:
-        void validate();
+    protected:
+        virtual void validate();
 
     public:
-        auto coeffs() const -> std::vector<Tp> const& { return m_Coefficients; }
-        auto order() const { return m_Coefficients.size()-1; }
-        auto size() const { return m_Coefficients.size(); }
+        virtual auto coeffs() const -> std::vector<Tp> const& { return m_Coefficients; }
+        virtual auto order() const -> size_t { return m_Coefficients.size()-1; }
+        virtual auto size() const -> size_t { return m_Coefficients.size(); }
 
-        void assign(size_t, Tp const&);
-        void assign(std::vector<Tp> const&);
-        void assign(std::vector<Tp>&&);
-        void assign(std::initializer_list<Tp>);
-        void clear();
+        virtual void assign(size_t, Tp const&);
+        virtual void assign(std::vector<Tp> const&);
+        virtual void assign(std::vector<Tp>&&);
+        virtual void assign(std::initializer_list<Tp>);
+        virtual void clear();
 
-        auto operator[](size_t i) const -> Tp const& { return m_Coefficients[i]; }
-        auto operator[](size_t i) -> Tp& { return m_Coefficients[i]; }
-        auto at(size_t i) const -> Tp const& { return m_Coefficients.at(i); }
-        auto at(size_t i) -> Tp& { return m_Coefficients.at(i); }
+        virtual auto operator[](size_t i) const -> Tp const& { return m_Coefficients[i]; }
+        virtual auto operator[](size_t i) -> Tp& { return m_Coefficients[i]; }
+        virtual auto at(size_t i) const -> Tp const& { return m_Coefficients.at(i); }
+        virtual auto at(size_t i) -> Tp& { return m_Coefficients.at(i); }
 
-        void swap(Poly<Tp>& other) { std::swap(m_Coefficients, other.m_Coefficients); }
+        virtual void swap(Poly<Tp>& other) { std::swap(m_Coefficients, other.m_Coefficients); }
 
-        Poly<Tp>& operator<<=(size_t);
-        Poly<Tp>& operator>>=(size_t);
+        virtual Poly<Tp>& operator<<=(size_t);
+        virtual Poly<Tp>& operator>>=(size_t);
 
-        Poly<Tp>& operator+=(Tp const&);
-        Poly<Tp>& operator-=(Tp const&);
-        Poly<Tp>& operator*=(Tp const&);
-        Poly<Tp>& operator/=(Tp const&);
+        virtual Poly<Tp>& operator+=(Tp const&);
+        virtual Poly<Tp>& operator-=(Tp const&);
+        virtual Poly<Tp>& operator*=(Tp const&);
+        virtual Poly<Tp>& operator/=(Tp const&);
 
         template <typename Tq>
         Poly<Tp>& operator+=(Poly<Tq> const&);
@@ -284,7 +285,7 @@ void mpp::Poly<Tp>::clear()
 template <typename Tp>
 mpp::Poly<Tp>& mpp::Poly<Tp>::operator<<=(size_t n)
 {
-    if (m_Coefficients.size() <= n)
+    if (size() <= n)
     {
         *this = Poly<Tp>{};
     }
@@ -292,6 +293,7 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator<<=(size_t n)
     {
         m_Coefficients.erase(m_Coefficients.begin(), m_Coefficients.begin()+n);
     }
+    validate();
     return *this;
 }
 
@@ -299,6 +301,7 @@ template <typename Tp>
 mpp::Poly<Tp>& mpp::Poly<Tp>::operator>>=(size_t n)
 {
     m_Coefficients.insert(m_Coefficients.begin(), n, mpp::identity<Tp,op_add>::get());
+    validate();
     return *this;
 }
 
@@ -378,7 +381,7 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator*=(Poly<Tq> const& other)
             coeffs[i+j] += m_Coefficients[i] * other[j];
         }
     }
-    assign(coeffs); // validates
+    assign(std::move(coeffs)); // validates
     return *this;
 }
 
