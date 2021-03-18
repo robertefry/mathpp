@@ -80,12 +80,12 @@ namespace mpp
 
 } // namespace mpp
 
-/* Group traits ************************************************************* */
+/* ************************************************************************** */
+// MathPP Specialisations
+/* ************************************************************************** */
 
 namespace mpp
 {
-
-    /* Tag helpers ********************************************************** */
 
     template <typename Tp, typename Op>
     struct identity<mpp::Poly<Tp>,Op>
@@ -94,6 +94,10 @@ namespace mpp
         {
             static mpp::Poly<Tp> s_ident = mpp::Poly<Tp>{identity<Tp,Op>::get()};
             return s_ident;
+        }
+        static mpp::Poly<Tp>& make(mpp::Poly<Tp>& poly)
+        {
+            return poly = get();
         }
     };
 
@@ -163,7 +167,7 @@ namespace mpp
 
 template <typename Tp>
 mpp::Poly<Tp>::Poly()
-    : m_Coefficients{Tp{}}
+    : m_Coefficients{mpp::identity<Tp,op_add>::get()}
 {
 }
 
@@ -236,9 +240,10 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator=(std::initializer_list<Tq> coeffs)
 template <typename Tp>
 void mpp::Poly<Tp>::validate()
 {
-    auto itr = std::find_if(m_Coefficients.rbegin(), m_Coefficients.rend(), [](auto coeff){ return coeff != Tp{}; });
+    auto const pred = [](auto coeff) { return coeff != mpp::identity<Tp,op_add>::get(); };
+    auto itr = std::find_if(m_Coefficients.rbegin(), m_Coefficients.rend(), pred);
     m_Coefficients.erase(itr.base(), m_Coefficients.end());
-    if (m_Coefficients.size() == 0) m_Coefficients.emplace_back();
+    if (m_Coefficients.size() == 0) m_Coefficients.push_back(mpp::identity<Tp,op_add>::get());
 }
 
 template <typename Tp>
@@ -293,7 +298,7 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator<<=(size_t n)
 template <typename Tp>
 mpp::Poly<Tp>& mpp::Poly<Tp>::operator>>=(size_t n)
 {
-    m_Coefficients.insert(m_Coefficients.begin(), n, Tp{});
+    m_Coefficients.insert(m_Coefficients.begin(), n, mpp::identity<Tp,op_add>::get());
     return *this;
 }
 
@@ -435,8 +440,9 @@ bool operator==(mpp::Poly<Tp> const& poly1, mpp::Poly<Tp> const& poly2)
 template <typename Tp, typename Tq>
 std::compare_three_way_result_t<Tp,Tq> operator<=>(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 {
-    if (poly1.order() > poly2.order()) return poly1.coeffs().back() <=> mpp::identity<Tp,mpp::op_add>::get();
-    if (poly1.order() < poly2.order()) return mpp::identity<Tp,mpp::op_add>::get() <=> poly2.coeffs().back();
+    using mpp::op_add;  using mpp::op_mul;
+    if (poly1.order() > poly2.order()) return poly1.coeffs().back() <=> mpp::identity<Tp,op_add>::get();
+    if (poly1.order() < poly2.order()) return mpp::identity<Tp,op_add>::get() <=> poly2.coeffs().back();
 
     const size_t order = poly1.order();
     for (size_t i = order; i <= order; --i)
@@ -461,7 +467,8 @@ auto operator<<(mpp::Poly<Tp> const& poly, size_t n)
 template <typename Tp>
 auto operator>>(mpp::Poly<Tp> const& poly, size_t n)
 {
-    auto coeffs = std::vector<Tp>(n,Tp{});
+    using mpp::op_add;  using mpp::op_mul;
+    auto coeffs = std::vector<Tp>(n,mpp::identity<Tp,op_add>::get());
     coeffs.insert(coeffs.end(),poly.coeffs().begin(),poly.coeffs().end());
     return mpp::Poly<Tp>{coeffs};
 }
@@ -469,13 +476,14 @@ auto operator>>(mpp::Poly<Tp> const& poly, size_t n)
 template <typename Tp>
 auto operator+(mpp::Poly<Tp> const& poly)
 {
-    using Tr = decltype(Tp{}+poly[0]);
+    using mpp::op_add;  using mpp::op_mul;
+    using Tr = decltype(mpp::identity<Tp,op_add>::get()+poly[0]);
     std::vector<Tr> coeffs;
     coeffs.reserve(poly.size());
 
     for (auto const& coeff : poly.coeffs())
     {
-        coeffs.push_back(Tp{}+coeff);
+        coeffs.push_back(mpp::identity<Tp,op_add>::get()+coeff);
     }
     return mpp::Poly<Tr>{coeffs};
 }
@@ -483,13 +491,14 @@ auto operator+(mpp::Poly<Tp> const& poly)
 template <typename Tp>
 auto operator-(mpp::Poly<Tp> const& poly)
 {
-    using Tr = decltype(Tp{}-poly[0]);
+    using mpp::op_add;  using mpp::op_mul;
+    using Tr = decltype(mpp::identity<Tp,op_add>::get()-poly[0]);
     std::vector<Tr> coeffs;
     coeffs.reserve(poly.size());
 
     for (auto const& coeff : poly.coeffs())
     {
-        coeffs.push_back(Tp{}-coeff);
+        coeffs.push_back(mpp::identity<Tp,op_add>::get()-coeff);
     }
     return mpp::Poly<Tr>{coeffs};
 }
@@ -571,6 +580,7 @@ auto operator/(mpp::Poly<Tp> const& poly, Tp const& c)
 template <typename Tp, typename Tq>
 auto operator+(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 {
+    using mpp::op_add;  using mpp::op_mul;
     using Tr = decltype(poly1[0]+poly2[0]);
     std::vector<Tr> coeffs;
     coeffs.reserve(std::max(poly1.size(),poly2.size()));
@@ -586,7 +596,7 @@ auto operator+(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
     }
     for (; index <= poly2.order(); ++index)
     {
-        coeffs.push_back(Tp{}+poly2[index]);
+        coeffs.push_back(mpp::identity<Tp,op_add>::get()+poly2[index]);
     }
     return mpp::Poly<Tr>{std::move(coeffs)};
 }
@@ -594,6 +604,7 @@ auto operator+(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 template <typename Tp, typename Tq>
 auto operator-(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 {
+    using mpp::op_add;  using mpp::op_mul;
     using Tr = decltype(poly1[0]-poly2[0]);
     std::vector<Tr> coeffs;
     coeffs.reserve(std::max(poly1.size(),poly2.size()));
@@ -609,7 +620,7 @@ auto operator-(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
     }
     for (; index <= poly2.order(); ++index)
     {
-        coeffs.push_back(Tp{}-poly2[index]);
+        coeffs.push_back(mpp::identity<Tp,op_add>::get()-poly2[index]);
     }
     return mpp::Poly<Tr>{std::move(coeffs)};
 }
