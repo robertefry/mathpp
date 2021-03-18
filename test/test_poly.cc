@@ -79,7 +79,7 @@ TEST(MPP_POLY, LIFETIME)
     }
 }
 
-TEST(MPP_POLY, GROUP_TRAITS)
+TEST(MPP_POLY, MATHPP)
 {
     using mpp::op_add;  using mpp::op_mul;
     {
@@ -91,10 +91,6 @@ TEST(MPP_POLY, GROUP_TRAITS)
         auto poly1 = mpp::Poly<int>{1};
         auto poly2 = mpp::identity<mpp::Poly<int>,mpp::op_mul>::get();
         EXPECT_TRUE(poly1 == poly2);
-    }
-    {
-        auto poly_int = mpp::has_gcd<mpp::Poly<int>,op_add,op_mul>::value;
-        EXPECT_TRUE(poly_int);
     }
 }
 

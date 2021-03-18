@@ -2,7 +2,7 @@
 #ifndef __HH_MPP_GCD
 #define __HH_MPP_GCD
 
-#include "group_traits.hh"
+#include "mathpp/mathpp.hh"
 
 #include <tuple>
 #include <utility>
@@ -15,11 +15,9 @@ namespace mpp
 {
 
     template <typename Tp>
-        requires is_gcd_domain<Tp,op_add,op_mul>::value
     Tp gcd(Tp const& a, Tp const& b);
 
     template <typename Tp>
-        requires is_gcd_domain<Tp,op_add,op_mul>::value
     std::tuple<Tp,Tp> gcd_extended(Tp const& a, Tp const& b);
 
 } // namespace mpp
@@ -29,7 +27,6 @@ namespace mpp
 /* ************************************************************************** */
 
 template <typename Tp>
-    requires mpp::is_gcd_domain<Tp,mpp::op_add,mpp::op_mul>::value
 Tp mpp::gcd(Tp const& a, Tp const& b)
 {
     if (a < b) return gcd(b,a);
@@ -46,7 +43,6 @@ Tp mpp::gcd(Tp const& a, Tp const& b)
 }
 
 template <typename Tp>
-    requires mpp::is_gcd_domain<Tp,mpp::op_add,mpp::op_mul>::value
 std::tuple<Tp,Tp> mpp::gcd_extended(Tp const& a, Tp const& b)
 {
     if (a < b)
