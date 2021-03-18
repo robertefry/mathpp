@@ -46,4 +46,5 @@ target_link_libraries(${PROJECT_TESTS_NAME} PUBLIC gtest_main gmock_main)
 add_test(NAME ${PROJECT_TESTS_NAME} COMMAND ${PROJECT_TESTS_NAME})
 
 # Add test executable as build target
-add_custom_target(runtests ALL COMMAND ${PROJECT_TESTS_NAME} DEPENDS ${PROJECT_TESTS_NAME})
+add_custom_target(run_tests ALL COMMAND ctest DEPENDS ${PROJECT_TESTS_NAME})
+add_custom_target(run_gtests COMMAND ${PROJECT_TESTS_NAME} DEPENDS ${PROJECT_TESTS_NAME})
