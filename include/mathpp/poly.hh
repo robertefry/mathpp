@@ -239,8 +239,8 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator=(std::initializer_list<Tq> coeffs)
 template <typename Tp>
 void mpp::Poly<Tp>::validate()
 {
-    auto const pred = [](auto coeff) { return coeff != mpp::identity<Tp,op_add>::get(); };
-    auto itr = std::find_if(m_Coefficients.rbegin(), m_Coefficients.rend(), pred);
+    auto const pred = [](auto const& coeff) { return coeff != mpp::identity<Tp,op_add>::get(); };
+    auto const itr = std::find_if(m_Coefficients.rbegin(), m_Coefficients.rend(), pred);
     m_Coefficients.erase(itr.base(), m_Coefficients.end());
     if (m_Coefficients.size() == 0) m_Coefficients.push_back(mpp::identity<Tp,op_add>::get());
 }
