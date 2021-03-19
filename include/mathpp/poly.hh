@@ -111,7 +111,7 @@ namespace mpp
         }
         static mpp::Poly<Tp>& make(mpp::Poly<Tp>& e)
         {
-            return e *= -1;
+            return e *= mpp::inverse<Tp,op_add>::get(mpp::identity<Tp,op_mul>::get());
         }
     };
 
