@@ -92,6 +92,15 @@ TEST(MPP_POLY, MATHPP)
         auto poly2 = mpp::identity<mpp::Poly<int>,mpp::op_mul>::get();
         EXPECT_TRUE(poly1 == poly2);
     }
+    {
+        // TODO: test mathpp inverse of polynomials
+    }
+    {
+        // TODO: test mathpp absolute of polynomials
+    }
+    {
+        // TODO: test mathpp euclidean division of polynomials
+    }
 }
 
 TEST(MPP_POLY, OPERATORS)
