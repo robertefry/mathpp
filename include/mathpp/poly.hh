@@ -74,7 +74,7 @@ namespace mpp
         template <typename Tq>
         Poly<Tp>& operator%=(Poly<Tq> const&);
 
-    private:
+    protected:
         std::vector<Tp> m_Coefficients{};
     };
 
