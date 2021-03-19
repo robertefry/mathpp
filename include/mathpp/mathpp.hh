@@ -4,6 +4,7 @@
 
 #include <type_traits>
 #include <tuple>
+#include <cmath>
 
 /* ************************************************************************** */
 // Operation Definitions
@@ -67,38 +68,6 @@ namespace mpp
 } // namespace mpp
 
 /* ************************************************************************** */
-// Math Helper Default Implementation
-/* ************************************************************************** */
-
-namespace mpp
-{
-
-    template <typename Tp, typename Op>
-    struct absolute
-    {
-        static Tp get(Tp e)
-        {
-            return (e < mpp::identity<Tp,Op>::get()) ? mpp::inverse<Tp,Op>::get(e) : e;
-        }
-        static Tp& make(Tp& e)
-        {
-            if (e < mpp::identity<Tp,Op>::get()) e = mpp::inverse<Tp,Op>::get(e);
-            return e;
-        }
-    };
-
-    template <typename Tp, typename Tq>
-    struct division
-    {
-        static auto get(Tp const& dividend, Tp const& divisor)
-        {
-            return std::make_tuple(dividend/divisor,dividend%divisor);
-        }
-    };
-
-} // namespace mpp
-
-/* ************************************************************************** */
 // Math Helper Specialization
 /* ************************************************************************** */
 
@@ -139,6 +108,38 @@ namespace mpp
     {
         static Tp get(Tp e) { return 1/e; }
         static Tp& make(Tp& e) { return e = 1/e; }
+    };
+
+    // absolute
+
+    template <typename Tp, typename Op>
+        requires std::is_arithmetic<Tp>::value
+    struct absolute<Tp,Op>
+    {
+        static Tp get(Tp e)
+        {
+            return (e < mpp::identity<Tp,Op>::get()) ? mpp::inverse<Tp,Op>::get(e) : e;
+        }
+        static Tp& make(Tp& e)
+        {
+            if (e < mpp::identity<Tp,Op>::get()) e = mpp::inverse<Tp,Op>::get(e);
+            return e;
+        }
+    };
+
+    // division
+
+    template <typename Tp, typename Tq>
+        requires std::is_arithmetic<Tp>::value
+            && std::is_arithmetic<Tp>::value
+    struct division<Tp,Tq>
+    {
+        static auto get(Tp const& dividend, Tq const& divisor)
+        {
+            auto quotient = std::floor(dividend/divisor);
+            auto remainder = dividend % divisor;
+            return std::make_tuple(quotient,remainder);
+        }
     };
 
 } // namespace mpp
