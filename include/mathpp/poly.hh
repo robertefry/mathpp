@@ -62,6 +62,7 @@ namespace mpp
         virtual Poly<Tp>& operator-=(Tp const&);
         virtual Poly<Tp>& operator*=(Tp const&);
         virtual Poly<Tp>& operator/=(Tp const&);
+        virtual Poly<Tp>& operator%=(Tp const&);
 
         template <typename Tq>
         Poly<Tp>& operator+=(Poly<Tq> const&);
@@ -131,7 +132,6 @@ namespace mpp
         }
     };
 
-    // todo use Tp only, for euclidean domain
     template <typename Tp, typename Tq>
     struct division<mpp::Poly<Tp>,mpp::Poly<Tq>>
     {
@@ -344,6 +344,24 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator/=(Tp const& c)
     for (Tp& coeff : m_Coefficients)
     {
         coeff /= c;
+    }
+    validate();
+    return *this;
+}
+
+template <typename Tp>
+mpp::Poly<Tp>& mpp::Poly<Tp>::operator%=(Tp const& c)
+{
+    if constexpr(std::is_floating_point<Tp>::value)
+    {
+        m_Coefficients.clear();
+    }
+    else
+    {
+        for (Tp& coeff : m_Coefficients)
+        {
+            coeff %= c;
+        }
     }
     validate();
     return *this;
