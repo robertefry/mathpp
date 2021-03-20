@@ -59,6 +59,13 @@ namespace mpp
     //     static Tp& make(Tp&);
     // };
 
+    template <typename Tp>
+    struct modulo;
+    // {
+    //     static Tp get(Tp const&);
+    //     static Tp& make(Tp&);
+    // };
+
     template <typename Tp, typename Tq>
     struct division;
     // {
@@ -124,6 +131,22 @@ namespace mpp
         {
             if (e < mpp::identity<Tp,Op>::get()) e = mpp::inverse<Tp,Op>::get(e);
             return e;
+        }
+    };
+
+    // modulo
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+    struct modulo<Tp>
+    {
+        static Tp get(Tp const& e, Tp n)
+        {
+            return (e < 0) ? std::fmod(-e,n) : std::fmod(e,n);
+        }
+        static Tp& make(Tp& e, Tp n)
+        {
+            return e = get(e,n);
         }
     };
 

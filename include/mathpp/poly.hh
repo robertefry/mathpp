@@ -352,16 +352,9 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator/=(Tp const& c)
 template <typename Tp>
 mpp::Poly<Tp>& mpp::Poly<Tp>::operator%=(Tp const& c)
 {
-    if constexpr(std::is_floating_point<Tp>::value)
+    for (Tp& coeff : m_Coefficients)
     {
-        m_Coefficients.clear();
-    }
-    else
-    {
-        for (Tp& coeff : m_Coefficients)
-        {
-            coeff %= c;
-        }
+        mpp::modulo<Tp>::make(coeff,c);
     }
     validate();
     return *this;
@@ -602,6 +595,19 @@ auto operator/(mpp::Poly<Tp> const& poly, Tp const& c)
         coeffs.push_back(coeff/c);
     }
     return mpp::Poly<Tr>{coeffs};
+}
+
+template <typename Tp>
+auto operator%(mpp::Poly<Tp> const& poly, Tp const& c)
+{
+    std::vector<Tp> coeffs;
+    coeffs.reserve(poly.size());
+
+    for (Tp const& coeff : poly)
+    {
+        coeffs.push_back(mpp::modulo<Tp>::get(coeff,c));
+    }
+    return mpp::Poly<Tp>{coeffs};
 }
 
 template <typename Tp, typename Tq>
