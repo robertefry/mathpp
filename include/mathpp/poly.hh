@@ -138,9 +138,8 @@ namespace mpp
         static auto euclidean(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
         {
             using Tr = decltype(poly1[0]/poly2[0]);
-            using Ts = decltype(poly1[0]%poly2[0]);
             mpp::Poly<Tr> quotient;
-            mpp::Poly<Ts> remainder = poly1;
+            mpp::Poly<Tr> remainder = poly1;
 
             using abs = mpp::absolute<mpp::Poly<Tp>,op_add>;
             while (abs::get(remainder) >= abs::get(poly2))
@@ -151,7 +150,7 @@ namespace mpp
                 quotient += term;
                 remainder -= term * poly2;
             }
-            return std::tuple<mpp::Poly<Tr>,mpp::Poly<Ts>>{quotient,remainder};
+            return std::make_tuple(quotient,remainder);
         }
         static auto get(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
         {
