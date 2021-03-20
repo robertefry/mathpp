@@ -4,7 +4,7 @@
 #include <mathpp/gcd.hh>
 #include <mathpp/poly.hh>
 
-TEST(GCD, INTEGERS)
+TEST(MPP_GCD, INTEGERS)
 {
     {
         auto d = mpp::gcd<int>(123,45);
@@ -14,6 +14,10 @@ TEST(GCD, INTEGERS)
         auto d = mpp::gcd<int>(45,123);
         EXPECT_EQ(d, 3);
     }
+}
+
+TEST(MPP_GCD_EXTENDED, INTEGERS)
+{
     {
         auto [x,y] = mpp::gcd_extended<int>(123,45);
         EXPECT_EQ(x, -4);
@@ -26,7 +30,7 @@ TEST(GCD, INTEGERS)
     }
 }
 
-TEST(GCD, POLYNOMIALS)
+TEST(MPP_GCD, POLYNOMIALS)
 {
     {
         auto poly1 = mpp::Poly<int>{1,1} * mpp::Poly<int>{1,2}; // (1+x)(1+2x)
@@ -42,6 +46,10 @@ TEST(GCD, POLYNOMIALS)
         auto gcd = mpp::gcd(poly2,poly1);
         EXPECT_EQ(gcd.coeffs(), poly3.coeffs());  // gcd of (1+x)(1+2x) and (1+x)(2+3x) is (1+x)
     }
+}
+
+TEST(MPP_GCD_EXTENDED, POLYNOMIALS)
+{
     {
         auto poly1 = mpp::Poly<int>{1,1} * mpp::Poly<int>{1,2}; // (1+x)(1+2x)
         auto poly2 = mpp::Poly<int>{1,1} * mpp::Poly<int>{2,3}; // (1+x)(2+3x)
