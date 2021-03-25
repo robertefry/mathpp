@@ -91,7 +91,7 @@ namespace mpp
     template <typename Tp, typename Op>
     struct identity<mpp::Poly<Tp>,Op>
     {
-        constexpr static bool has(Tp e)
+        constexpr static bool has()
         {
             return true;
         }
@@ -109,9 +109,13 @@ namespace mpp
     template <typename Tp>
     struct inverse<mpp::Poly<Tp>,op_add>
     {
-        constexpr static bool has(Tp e)
+        constexpr static bool has()
         {
             return true;
+        }
+        constexpr static bool can(Tp)
+        {
+            return has();
         }
         static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
         {
@@ -126,9 +130,13 @@ namespace mpp
     template <typename Tp, typename Op>
     struct absolute<mpp::Poly<Tp>,Op>
     {
-        constexpr static bool has(Tp e)
+        constexpr static bool has()
         {
             return true;
+        }
+        constexpr static bool can(Tp)
+        {
+            return has();
         }
         static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
         {
@@ -147,6 +155,14 @@ namespace mpp
     template <typename Tp, typename Tq>
     struct division<mpp::Poly<Tp>,mpp::Poly<Tq>>
     {
+        constexpr static bool has()
+        {
+            return true;
+        }
+        constexpr static bool can(Tp)
+        {
+            return has();
+        }
         static auto euclidean(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
         {
             using Tr = decltype(poly1[0]/poly2[0]);
