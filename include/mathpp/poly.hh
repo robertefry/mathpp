@@ -91,6 +91,10 @@ namespace mpp
     template <typename Tp, typename Op>
     struct identity<mpp::Poly<Tp>,Op>
     {
+        constexpr static bool has(Tp e)
+        {
+            return true;
+        }
         static mpp::Poly<Tp> const& get()
         {
             static mpp::Poly<Tp> s_ident = mpp::Poly<Tp>{identity<Tp,Op>::get()};
@@ -105,6 +109,10 @@ namespace mpp
     template <typename Tp>
     struct inverse<mpp::Poly<Tp>,op_add>
     {
+        constexpr static bool has(Tp e)
+        {
+            return true;
+        }
         static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
         {
             return -e;
@@ -118,6 +126,10 @@ namespace mpp
     template <typename Tp, typename Op>
     struct absolute<mpp::Poly<Tp>,Op>
     {
+        constexpr static bool has(Tp e)
+        {
+            return true;
+        }
         static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
         {
             using identity = mpp::identity<mpp::Poly<Tp>,Op>;
