@@ -30,6 +30,25 @@ TEST(MPP_POLY, LIFETIME)
         EXPECT_EQ(poly.coeffs(), vec);
     }
     {
+        auto vec = std::vector<int>{1,2,3,4,5};
+        auto poly = mpp::Poly<int>{};
+        poly = {1,2,3,4,5};                                 // assign initializer_list
+        EXPECT_EQ(poly.coeffs(), vec);
+    }
+    {
+        auto vec = std::vector<int>{1,2,3,4,5};
+        auto poly = mpp::Poly<int>{};
+        poly = vec;                                         // assign copy vector
+        EXPECT_EQ(poly.coeffs(), vec);
+    }
+    {
+        auto vec1 = std::vector<int>{1,2,3,4,5};
+        auto vec2 = std::vector<int>{1,2,3,4,5};
+        auto poly = mpp::Poly<int>{};
+        poly = std::move(vec1);                             // assign copy vector
+        EXPECT_EQ(poly.coeffs(), vec2);
+    }
+    {
         auto poly1 = mpp::Poly<int>{1,2,3,4,5};
         auto poly2 = mpp::Poly<int>{poly1};                 // copy construct
         EXPECT_EQ(poly1.coeffs(), poly2.coeffs());

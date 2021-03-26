@@ -32,8 +32,6 @@ namespace mpp
 
         template <typename Tq>
         Poly<Tp>& operator=(Poly<Tq> const&);
-        template <typename Tq>
-        Poly<Tp>& operator=(std::initializer_list<Tq>);
 
     protected:
         virtual void validate();
@@ -250,15 +248,6 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator=(Poly<Tq> const& other)
     {
         m_Coefficients.push_back(static_cast<Tp>(elem));
     }
-    validate();
-    return *this;
-}
-
-template <typename Tp>
-template <typename Tq>
-mpp::Poly<Tp>& mpp::Poly<Tp>::operator=(std::initializer_list<Tq> coeffs)
-{
-    m_Coefficients = coeffs;
     validate();
     return *this;
 }
