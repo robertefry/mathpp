@@ -21,12 +21,12 @@ TEST(MPP_POLY, LIFETIME)
     }
     {
         auto vec = std::vector<int>{1,2,3,4,5};
-        auto poly = mpp::Poly<int>{{1,2,3,4,5}};            // move coeffs
+        auto poly = mpp::Poly<int>{vec};                    // copy coeffs
         EXPECT_EQ(poly.coeffs(), vec);
     }
     {
         auto vec = std::vector<int>{1,2,3,4,5};
-        auto poly = mpp::Poly<int>{vec};                    // copy coeffs
+        auto poly = mpp::Poly<int>{{1,2,3,4,5}};            // move coeffs
         EXPECT_EQ(poly.coeffs(), vec);
     }
     {
@@ -45,7 +45,7 @@ TEST(MPP_POLY, LIFETIME)
         auto vec1 = std::vector<int>{1,2,3,4,5};
         auto vec2 = std::vector<int>{1,2,3,4,5};
         auto poly = mpp::Poly<int>{};
-        poly = std::move(vec1);                             // assign copy vector
+        poly = std::move(vec1);                             // assign move vector
         EXPECT_EQ(poly.coeffs(), vec2);
     }
     {
@@ -54,16 +54,16 @@ TEST(MPP_POLY, LIFETIME)
         EXPECT_EQ(poly1.coeffs(), poly2.coeffs());
     }
     {
-        auto poly1 = mpp::Poly<int>{1,2,3,4,5};
-        auto poly2 = mpp::Poly<int>{};
-        poly2 = poly1;                                      // copy assign
-        EXPECT_EQ(poly1.coeffs(), poly2.coeffs());
-    }
-    {
         auto vec = std::vector<int>{1,2,3,4,5};
         auto poly1 = mpp::Poly<int>{vec};
         auto poly2 = mpp::Poly<int>{std::move(poly1)};      // move construct
         EXPECT_EQ(poly2.coeffs(), vec);
+    }
+    {
+        auto poly1 = mpp::Poly<int>{1,2,3,4,5};
+        auto poly2 = mpp::Poly<int>{};
+        poly2 = poly1;                                      // copy assign
+        EXPECT_EQ(poly1.coeffs(), poly2.coeffs());
     }
     {
         auto vec = std::vector<int>{1,2,3,4,5};
@@ -79,15 +79,15 @@ TEST(MPP_POLY, LIFETIME)
     }
     {
         auto poly1 = mpp::Poly<int>{1,2,3,4,5};
-        auto poly2 = mpp::Poly<float>{};
-        poly2 = poly1;                                      // copy cast assign
-        EXPECT_TRUE(poly1 == poly2);
-    }
-    {
-        auto poly1 = mpp::Poly<int>{1,2,3,4,5};
         auto poly2 = mpp::Poly<int>{poly1};
         auto poly3 = mpp::Poly<float>{std::move(poly2)};    // move cast construct
         EXPECT_TRUE(poly1 == poly3);
+    }
+    {
+        auto poly1 = mpp::Poly<int>{1,2,3,4,5};
+        auto poly2 = mpp::Poly<float>{};
+        poly2 = poly1;                                      // copy cast assign
+        EXPECT_TRUE(poly1 == poly2);
     }
     {
         auto poly1 = mpp::Poly<int>{1,2,3,4,5};
