@@ -150,6 +150,12 @@ namespace mpp
         }
     };
 
+    template <typename Tp>
+    struct modulo<mpp::Poly<Tp>>
+    {
+        // TODO: modulo<mpp::Poly<Tp>>
+    };
+
     template <typename Tp, typename Tq>
     struct division<mpp::Poly<Tp>,mpp::Poly<Tq>>
     {
