@@ -222,7 +222,7 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
     {
         using Tp = float;
         using absolute = mpp::absolute<Tp,op_mul>;
-        Tp value = -10;
+        Tp value = -0.1f;
 
         auto has = absolute::has();
         EXPECT_TRUE(has == mpp::tristate::all);
@@ -231,10 +231,10 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         EXPECT_TRUE(can);
 
         auto value1 = absolute::get(value);
-        EXPECT_EQ(value1,-0.1f);
+        EXPECT_EQ(value1,-10);
 
         absolute::make(value);
-        EXPECT_EQ(value,-0.1f);
+        EXPECT_EQ(value,-10);
     }
 }
 

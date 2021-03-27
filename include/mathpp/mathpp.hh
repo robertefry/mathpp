@@ -272,11 +272,11 @@ namespace mpp
         }
         static Tp get(Tp e)
         {
-            return (absolute<Tp,op_add>::get(e) > 1) ? 1/e : e;
+            return (absolute<Tp,op_add>::get(e) < 1) ? 1/e : e;
         }
         static Tp& make(Tp& e)
         {
-            return (absolute<Tp,op_add>::get(e) > 1) ? e = 1/e : e;
+            return (absolute<Tp,op_add>::get(e) < 1) ? e = 1/e : e;
         }
     };
 
