@@ -86,6 +86,8 @@ namespace mpp
 namespace mpp
 {
 
+    // identity
+
     template <typename Tp, typename Op>
     struct identity<mpp::Poly<Tp>,Op>
     {
@@ -103,6 +105,8 @@ namespace mpp
             return poly = get();
         }
     };
+
+    // inverse
 
     template <typename Tp>
     struct inverse<mpp::Poly<Tp>,op_add>
@@ -129,6 +133,8 @@ namespace mpp
         }
     };
 
+    // absolute
+
     template <typename Tp>
     struct absolute<mpp::Poly<Tp>,op_add>
     {
@@ -153,6 +159,30 @@ namespace mpp
         }
     };
 
+    // modulo
+
+    template <typename Tp, typename Tq>
+        requires std::is_convertible<Tq,mpp::Poly<Tp>>::value
+    struct modulo<mpp::Poly<Tp>,Tq>
+    {
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(mpp::Poly<Tp> const&, Tq const&)
+        {
+            return true;
+        }
+        static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e, Tq const& n)
+        {
+            return e % n;
+        }
+        static mpp::Poly<Tp>& make(mpp::Poly<Tp>& e, Tq const& n)
+        {
+            return e %= n;
+        }
+    };
+
     template <typename Tp, typename Tq>
         requires std::is_convertible<Tq,Tp>::value
     struct modulo<mpp::Poly<Tp>,mpp::Poly<Tq>>
@@ -172,20 +202,45 @@ namespace mpp
         }
         static mpp::Poly<Tp>& make(mpp::Poly<Tp>& e, mpp::Poly<Tq> const& n)
         {
-            auto const conv = n - (mpp::Poly<Tq>{n.coeffs().back()} <<= n.order());
+            auto const c_coeffs = std::vector<Tq>{n.coeffs().begin(),n.coeffs().end()-1};
+            auto const c_poly = -mpp::Poly<Tq>{std::move(c_coeffs)};
 
             while (e.order() >= n.order())
             {
-                auto const order = e.order();
                 auto const coeff = e.coeffs().back();
-                e -= mpp::Poly<Tp>{coeff} <<= order;
-                e += coeff * conv;
+                e -= mpp::Poly<Tp>{coeff} >>= e.order();
+                e += (coeff * c_poly) >>= (e.order() - n.order() + 1);
             }
             return e;
         }
     };
 
+    // division
+
     template <typename Tp, typename Tq>
+        requires std::is_convertible<Tq,Tp>::value
+    struct division<mpp::Poly<Tp>,Tq>
+    {
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(mpp::Poly<Tp> const&, Tq const&)
+        {
+            return true;
+        }
+        static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e, Tq const& c)
+        {
+            return e / c;
+        }
+        static mpp::Poly<Tp>& make(mpp::Poly<Tp>& e, Tq const& c)
+        {
+            return e /= c;
+        }
+    };
+
+    template <typename Tp, typename Tq>
+        requires std::is_convertible<Tq,Tp>::value
     struct division<mpp::Poly<Tp>,mpp::Poly<Tq>>
     {
         constexpr static tristate has()
@@ -607,7 +662,7 @@ auto operator*(mpp::Poly<Tp> const& poly, Tp const& c)
     std::vector<Tp> coeffs;
     coeffs.reserve(poly.size());
 
-    for (Tp const& coeff : poly)
+    for (Tp const& coeff : poly.coeffs())
     {
         coeffs.push_back(coeff*c);
     }
@@ -620,7 +675,7 @@ auto operator*(Tp const& c, mpp::Poly<Tp> const& poly)
     std::vector<Tp> coeffs;
     coeffs.reserve(poly.size());
 
-    for (Tp const& coeff : poly)
+    for (Tp const& coeff : poly.coeffs())
     {
         coeffs.push_back(c*coeff);
     }
@@ -633,7 +688,7 @@ auto operator/(mpp::Poly<Tp> const& poly, Tp const& c)
     std::vector<Tp> coeffs;
     coeffs.reserve(poly.size());
 
-    for (Tp const& coeff : poly)
+    for (Tp const& coeff : poly.coeffs())
     {
         coeffs.push_back(coeff/c);
     }
@@ -646,7 +701,7 @@ auto operator%(mpp::Poly<Tp> const& poly, Tp const& c)
     std::vector<Tp> coeffs;
     coeffs.reserve(poly.size());
 
-    for (Tp const& coeff : poly)
+    for (Tp const& coeff : poly.coeffs())
     {
         coeffs.push_back(mpp::modulo<Tp,Tp>::get(coeff,c));
     }

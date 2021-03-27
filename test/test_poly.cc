@@ -176,7 +176,43 @@ TEST(MPP_POLY, MATHPP)
         EXPECT_TRUE(has == mpp::tristate::none);
     }
     {
-        // TODO: test mathpp modulo of polynomials
+        using modulo = mpp::modulo<mpp::Poly<int>,mpp::Poly<int>>;
+        auto has = modulo::has();
+        EXPECT_TRUE(has == mpp::tristate::all);
+
+        // convolutional polynomials Z[x]\(x^3-1)
+        {
+            auto const mod = mpp::Poly<int>{-1,0,0,1};
+
+            auto poly1 = mpp::Poly<int>{1,1,1,1,1};
+            auto can = modulo::can(poly1,mod);
+            EXPECT_TRUE(can);
+
+            auto const poly = mpp::Poly<int>{2,2,1};
+
+            auto poly2 = modulo::get(poly1,mod);
+            EXPECT_TRUE(poly2 == poly);
+
+            modulo::make(poly1,mod);
+            EXPECT_TRUE(poly1 == poly);
+        }
+
+        // convolutional polynomials Z[x]\(x^3-x-1)
+        {
+            auto const mod = mpp::Poly<int>{-1,-1,0,1};
+
+            auto poly1 = mpp::Poly<int>{1,1,1,1,1};
+            auto can = modulo::can(poly1,mod);
+            EXPECT_TRUE(can);
+
+            auto const poly = mpp::Poly<int>{2,3,2};
+
+            auto poly2 = modulo::get(poly1,mod);
+            EXPECT_TRUE(poly2 == poly);
+
+            modulo::make(poly1,mod);
+            EXPECT_TRUE(poly1 == poly);
+        }
     }
     {
         using division = mpp::division<mpp::Poly<int>,mpp::Poly<int>>;
