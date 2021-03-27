@@ -50,7 +50,7 @@ namespace mpp
     template <typename Tp, typename Op>
     struct absolute;
 
-    template <typename Tp>
+    template <typename Tp, typename Tq>
     struct modulo;
 
     template <typename Tp, typename Tq>
@@ -85,7 +85,7 @@ namespace mpp
         {
             return false;
         }
-        constexpr static bool can(Tp)
+        constexpr static bool can(Tp const&)
         {
             return has();
         }
@@ -100,7 +100,7 @@ namespace mpp
         {
             return mpp::identity<Tp,Op>::has() && mpp::inverse<Tp,Op>::has();
         }
-        constexpr static bool can(Tp)
+        constexpr static bool can(Tp const&)
         {
             return has();
         }
@@ -124,16 +124,16 @@ namespace mpp
 
     // modulo
 
-    template <typename Tp>
+    template <typename Tp, typename Tq>
     struct modulo
     {
         constexpr static bool has()
         {
             return false;
         }
-        constexpr static bool can(Tp)
+        constexpr static bool can(Tp const&, Tq const&)
         {
-            return has();
+            return false;
         }
     };
 
@@ -146,7 +146,7 @@ namespace mpp
         {
             return true;
         }
-        constexpr static bool can(Tp)
+        constexpr static bool can(Tp const&, Tq const&)
         {
             return has();
         }
@@ -253,23 +253,24 @@ namespace mpp
 
     // modulo
 
-    template <typename Tp>
+    template <typename Tp, typename Tq>
         requires std::is_arithmetic<Tp>::value
-    struct modulo<Tp>
+            && std::is_arithmetic<Tq>::value
+    struct modulo<Tp,Tq>
     {
         constexpr static bool has()
         {
             return true;
         }
-        constexpr static bool can(Tp)
+        constexpr static bool can(Tp, Tq)
         {
             return has();
         }
-        static Tp get(Tp e, Tp n)
+        static Tp get(Tp e, Tq n)
         {
             return (e < 0) ? n - std::fmod(-e,n) : std::fmod(e,n);
         }
-        static Tp& make(Tp& e, Tp n)
+        static Tp& make(Tp& e, Tq n)
         {
             return e = get(e,n);
         }

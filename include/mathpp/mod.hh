@@ -94,27 +94,30 @@ namespace mpp
     template <typename Tp, typename Op>
     struct identity<mpp::Mod<Tp>,Op>
     {
-        static bool has(Tp e)
+        constexpr static bool has()
         {
             return true;
         }
-        static mpp::Mod<Tp> const& get(Tp const& mod)
+        static mpp::Mod<Tp> get(Tp const& mod)
         {
-            static mpp::Mod<Tp> s_ident = mpp::Mod<Tp>{mod,identity<Tp,Op>::get()};
-            return s_ident;
+            return mpp::Mod<Tp>{mod,identity<Tp,Op>::get()};
         }
         static mpp::Mod<Tp>& make(mpp::Mod<Tp>& e)
         {
-            return e = get(e.modulus());
+            return e = identity<Tp,Op>::get();
         }
     };
 
     template <typename Tp>
     struct inverse<mpp::Mod<Tp>,op_add>
     {
-        static bool has(Tp e)
+        constexpr static bool has()
         {
             return true;
+        }
+        constexpr static bool can(mpp::Mod<Tp> const&)
+        {
+            return has();
         }
         static mpp::Mod<Tp> get(mpp::Mod<Tp> const& e)
         {
@@ -151,11 +154,66 @@ namespace mpp
         }
     };
 
-    template <typename Tp>
-    struct modulo<mpp::Mod<Tp>>
+    template <typename Tp, typename Op>
+    struct absolute<mpp::Mod<Tp>,Op>
     {
-        // TODO: modulo<mpp::Mod<Tp>>
+        constexpr static bool has()
+        {
+            return true;
+        }
+        constexpr static bool can(Tp const&)
+        {
+            return true;
+        }
+        static Tp get(Tp e)
+        {
+            return e;
+        }
+        static Tp& make(Tp& e)
+        {
+            return e;
+        }
     };
+
+    template <typename Tp, typename Tq>
+    struct modulo<mpp::Mod<Tp>,Tq>
+    {
+        constexpr static bool has()
+        {
+            return true;
+        }
+        constexpr static bool can(mpp::Mod<Tp> const&, Tq const&)
+        {
+            return std::is_convertible<Tq,Tp>::value;
+        }
+        static mpp::Mod<Tp> get(mpp::Mod<Tp> const& e, Tp const& n)
+        {
+            return mpp::Mod<Tp>{n,e.value()};
+        }
+    };
+
+    template <typename Tp, typename Tq>
+    struct modulo<mpp::Mod<Tp>,mpp::Mod<Tq>>
+    {
+        constexpr static bool has()
+        {
+            return true;
+        }
+        constexpr static bool can(mpp::Mod<Tp> const&, mpp::Mod<Tq> const&)
+        {
+            return std::is_convertible<Tq,Tp>::value;
+        }
+        static mpp::Mod<Tp> get(mpp::Mod<Tp> const& e, mpp::Mod<Tq> const& n)
+        {
+            return mpp::Mod<Tp>{n.value(),e.value()};
+        }
+    };
+
+    // template <typename Tp, typename Tq>
+    // struct division<mpp::Mod<Tp>,mpp::Mod<Tq>>
+    // {
+    //     // TODO division<mpp::Mod<Tp>,mpp::Mod<Tq>>
+    // };
 
 } // namespace mpp
 
@@ -249,7 +307,7 @@ mpp::Mod<Tp>& mpp::Mod<Tp>::operator=(Mod<Tq> const& other)
 template <typename Tp>
 void mpp::Mod<Tp>::validate()
 {
-    mpp::modulo<Tp>::make(m_Value,m_Modulus);
+    mpp::modulo<Tp,Tp>::make(m_Value,m_Modulus);
 }
 
 template <typename Tp>
@@ -345,7 +403,7 @@ mpp::Mod<Tp>& mpp::Mod<Tp>::operator/=(Tp const& num)
 template <typename Tp>
 mpp::Mod<Tp>& mpp::Mod<Tp>::operator%=(Tp const& num)
 {
-    mpp::modulo<Tp>::make(m_Value,num);
+    mpp::modulo<Tp,Tp>::make(m_Value,num);
     validate();
     return *this;
 }
@@ -390,7 +448,7 @@ template <typename Tp>
 template <typename Tq>
 mpp::Mod<Tp>& mpp::Mod<Tp>::operator%=(Mod<Tq> const& other)
 {
-    mpp::modulo<Tp>::make(m_Value,static_cast<Tp>(other.value()));
+    mpp::modulo<Tp,Tq>::make(m_Value,other.value());
     validate();
     return *this;
 }
@@ -400,17 +458,34 @@ mpp::Mod<Tp>& mpp::Mod<Tp>::operator%=(Mod<Tq> const& other)
 /* ************************************************************************** */
 
 template <typename Tp, typename Tq>
-bool operator==(mpp::Mod<Tp> const& mod1, mpp::Mod<Tq> const& mod2)
+bool operator==(mpp::Mod<Tp> const& mod, Tq const& val)
 {
-    if (mod1.value() >= mod2.modulus()) return false;
-    if (mod2.value() >= mod1.modulus()) return false;
-    return mod1.value() == mod2.value();
+    return mod.value() == val;
 }
 
 template <typename Tp, typename Tq>
-std::compare_three_way_result_t<Tp,Tq> operator<=>(mpp::Mod<Tp> const& mod1, mpp::Mod<Tq> const& mod2)
+bool operator<=>(mpp::Mod<Tp> const& mod, Tq const& val)
 {
-    return mod1.value() <=> mod2.value();
+    return mod.value() <=> val;
+}
+
+template <typename Tp, typename Tq>
+bool operator==(mpp::Mod<Tp> const& mod1, mpp::Mod<Tq> const& mod2)
+{
+    auto const gcd = mpp::gcd<Tp>(mod1.modulus(),mod2.modulus());
+    auto const val1 = mpp::modulo<Tp,Tp>::get(mod1.value(),gcd);
+    auto const val2 = mpp::modulo<Tp,Tp>::get(mod2.value(),gcd);
+    return val1 == val2;
+}
+
+template <typename Tp, typename Tq>
+auto operator<=>(mpp::Mod<Tp> const& mod1, mpp::Mod<Tq> const& mod2)
+    -> std::compare_three_way_result_t<Tp,Tq>
+{
+    auto const gcd = mpp::gcd<Tp>(mod1.modulus(),mod2.modulus());
+    auto const val1 = mpp::modulo<Tp,Tp>::get(mod1.value(),gcd);
+    auto const val2 = mpp::modulo<Tp,Tp>::get(mod2.value(),gcd);
+    return val1 <=> val2;
 }
 
 template <typename Tp, typename Tq>
@@ -432,7 +507,7 @@ auto operator+(mpp::Mod<Tp> const& mod)
 {
     using mpp::op_add;  using mpp::op_mul;
     auto value = mpp::identity<Tp,op_add>::get() + mod.value();
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
@@ -440,120 +515,127 @@ auto operator-(mpp::Mod<Tp> const& mod)
 {
     using mpp::op_add;  using mpp::op_mul;
     auto value = mpp::identity<Tp,op_add>::get() - mod.value();
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator+(mpp::Mod<Tp> const& mod, Tp const& c)
 {
     auto value = mod.value() + c;
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator+(Tp const& c, mpp::Mod<Tp> const& mod)
 {
     auto value = c + mod.value();
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator-(mpp::Mod<Tp> const& mod, Tp const& c)
 {
     auto value = mod.value() - c;
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator-(Tp const& c, mpp::Mod<Tp> const& mod)
 {
     auto value = c - mod.value();
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator*(mpp::Mod<Tp> const& mod, Tp const& c)
 {
     auto value = mod.value() * c;
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator*(Tp const& c, mpp::Mod<Tp> const& mod)
 {
     auto value = c * mod.value();
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator/(mpp::Mod<Tp> const& mod, Tp const& c)
 {
     auto value = mod.value() / c;
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator/(Tp const& c, mpp::Mod<Tp> const& mod)
 {
     auto value = c / mod.value();
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator%(mpp::Mod<Tp> const& mod, Tp const& c)
 {
-    auto value = mpp::modulo<Tp>::get(mod.value(),c);
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    auto value = mpp::modulo<Tp,Tp>::get(mod.value(),c);
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp>
 auto operator%(Tp const& c, mpp::Mod<Tp> const& mod)
 {
-    auto value = mpp::modulo<Tp>::get(c,mod.value());
-    return mpp::Mod<decltype(value)>{mod.modulus(),std::move(value)};
+    auto value = mpp::modulo<Tp,Tp>::get(c,mod.value());
+    return mpp::Mod<Tp>{mod.modulus(),std::move(value)};
 }
 
 template <typename Tp, typename Tq>
 auto operator+(mpp::Mod<Tp> const& mod1, mpp::Mod<Tq> const& mod2)
 {
-    using Tr = decltype(mod1.value()+mod2.value());
     auto value = mod1.value() + mod2.value();
-    auto constexpr gcd = mpp::gcd<Tr>(mod1.modulus(),mod2.modulus());
+
+    using Tr = decltype(value);
+    constexpr auto const gcd = mpp::gcd<Tr>(mod1.modulus(),mod2.modulus());
     return mpp::Mod<Tr>{gcd,std::move(value)};
 }
 
 template <typename Tp, typename Tq>
 auto operator-(mpp::Mod<Tp> const& mod1, mpp::Mod<Tq> const& mod2)
 {
-    using Tr = decltype(mod1.value()-mod2.value());
     auto value = mod1.value() - mod2.value();
 
-    auto constexpr gcd = mpp::gcd<Tr>(mod1.modulus(),mod2.modulus());
+    using Tr = decltype(value);
+    constexpr auto const gcd = mpp::gcd<Tr>(mod1.modulus(),mod2.modulus());
     return mpp::Mod<Tr>{gcd,std::move(value)};
 }
 
 template <typename Tp, typename Tq>
 auto operator*(mpp::Mod<Tp> const& mod1, mpp::Mod<Tq> const& mod2)
 {
-    using Tr = decltype(mod1.value()*mod2.value());
     auto value = mod1.value() * mod2.value();
 
-    auto constexpr gcd = mpp::gcd<Tr>(mod1.modulus(),mod2.modulus());
+    using Tr = decltype(value);
+    constexpr auto const gcd = mpp::gcd<Tr>(mod1.modulus(),mod2.modulus());
     return mpp::Mod<Tr>{gcd,std::move(value)};
 }
 
 template <typename Tp, typename Tq>
 auto operator/(mpp::Mod<Tp> const& mod1, mpp::Mod<Tq> const& mod2)
 {
-    using division = mpp::division<mpp::Mod<Tp>,mpp::Mod<Tq>>;
-    return std::get<0>(division::get(mod1,mod2));
+    auto value = mod1.value() / mod2.value();
+
+    using Tr = decltype(value);
+    constexpr auto const gcd = mpp::gcd<Tr>(mod1.modulus(),mod2.modulus());
+    return mpp::Mod<Tr>{gcd,std::move(value)};
 }
 
 template <typename Tp, typename Tq>
 auto operator%(mpp::Mod<Tp> const& mod1, mpp::Mod<Tq> const& mod2)
 {
-    using division = mpp::division<mpp::Mod<Tp>,mpp::Mod<Tq>>;
-    return std::get<1>(division::get(mod1,mod2));
+    auto value = mod1.value() % mod2.value();
+
+    using Tr = decltype(value);
+    constexpr auto const gcd = mpp::gcd<Tr>(mod1.modulus(),mod2.modulus());
+    return mpp::Mod<Tr>{gcd,std::move(value)};
 }
 
 /* ************************************************************************** */

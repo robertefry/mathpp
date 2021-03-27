@@ -86,6 +86,9 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
         auto has = inverse::has();
         EXPECT_TRUE(has);
 
+        auto can = inverse::can(Tp{});
+        EXPECT_TRUE(can);
+
         inverse::make(value);
         EXPECT_EQ(value,-10);
 
@@ -99,6 +102,9 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
 
         auto has = inverse::has();
         EXPECT_TRUE(has);
+
+        auto can = inverse::can(Tp{});
+        EXPECT_TRUE(can);
 
         inverse::make(value);
         EXPECT_EQ(value,-10);
@@ -130,6 +136,9 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
         auto has = inverse::has();
         EXPECT_TRUE(has);
 
+        auto can = inverse::can(Tp{});
+        EXPECT_TRUE(can);
+
         inverse::make(value);
         EXPECT_EQ(value,0.1f);
 
@@ -156,6 +165,9 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         auto has = absolute::has();
         EXPECT_TRUE(has);
 
+        auto can = absolute::can(Tp{});
+        EXPECT_TRUE(can);
+
         absolute::make(value);
         EXPECT_EQ(value,10);
 
@@ -169,6 +181,9 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
 
         auto has = absolute::has();
         EXPECT_TRUE(has);
+
+        auto can = absolute::can(Tp{});
+        EXPECT_TRUE(can);
 
         absolute::make(value);
         EXPECT_EQ(value,10);
@@ -200,6 +215,9 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         auto has = absolute::has();
         EXPECT_TRUE(has);
 
+        auto can = absolute::can(Tp{});
+        EXPECT_TRUE(can);
+
         absolute::make(value);
         EXPECT_EQ(value,10);
 
@@ -212,55 +230,70 @@ TEST(MATHPP, PRIMITIVE_MODULO)
 {
     {
         using Tp = unsigned;
-        using modulo = mpp::modulo<Tp>;
+        using modulo = mpp::modulo<Tp,Tp>;
         Tp value = 10, mod = 7;
 
         auto has = modulo::has();
         EXPECT_TRUE(has);
+
+        auto can = modulo::can(Tp{},Tp{});
+        EXPECT_TRUE(can);
 
         modulo::make(value,mod);
         EXPECT_EQ(value,3);
     }
     {
         using Tp = signed;
-        using modulo = mpp::modulo<Tp>;
+        using modulo = mpp::modulo<Tp,Tp>;
         Tp value = 10, mod = 7;
 
         auto has = modulo::has();
         EXPECT_TRUE(has);
+
+        auto can = modulo::can(Tp{},Tp{});
+        EXPECT_TRUE(can);
 
         modulo::make(value,mod);
         EXPECT_EQ(value,3);
     }
     {
         using Tp = signed;
-        using modulo = mpp::modulo<Tp>;
+        using modulo = mpp::modulo<Tp,Tp>;
         Tp value = -10, mod = 7;
 
         auto has = modulo::has();
         EXPECT_TRUE(has);
+
+        auto can = modulo::can(Tp{},Tp{});
+        EXPECT_TRUE(can);
 
         modulo::make(value,mod);
         EXPECT_EQ(value,4);
     }
     {
         using Tp = float;
-        using modulo = mpp::modulo<Tp>;
+        using modulo = mpp::modulo<Tp,Tp>;
         Tp value = 10, mod = 7;
 
         auto has = modulo::has();
         EXPECT_TRUE(has);
+
+        auto can = modulo::can(Tp{},Tp{});
+        EXPECT_TRUE(can);
 
         modulo::make(value,mod);
         EXPECT_EQ(value,3);
     }
     {
         using Tp = float;
-        using modulo = mpp::modulo<Tp>;
+        using modulo = mpp::modulo<Tp,Tp>;
         Tp value = -10, mod = 7;
 
         auto has = modulo::has();
         EXPECT_TRUE(has);
+
+        auto can = modulo::can(Tp{},Tp{});
+        EXPECT_TRUE(can);
 
         modulo::make(value,mod);
         EXPECT_EQ(value,4);

@@ -102,23 +102,97 @@ TEST(MPP_POLY, MATHPP)
 {
     using mpp::op_add;  using mpp::op_mul;
     {
-        auto poly1 = mpp::Poly<int>{0};
-        auto poly2 = mpp::identity<mpp::Poly<int>,mpp::op_add>::get();
-        EXPECT_TRUE(poly1 == poly2);
+        using identity = mpp::identity<mpp::Poly<int>,mpp::op_add>;
+        auto has = identity::has();
+        EXPECT_TRUE(has);
+
+        auto const poly = mpp::Poly<int>{0};
+
+        auto poly1 = identity::get();
+        EXPECT_TRUE(poly1 == poly);
+
+        auto poly2 = mpp::Poly<int>{1,2,3};
+        identity::make(poly2);
+        EXPECT_TRUE(poly2 == poly);
     }
     {
-        auto poly1 = mpp::Poly<int>{1};
-        auto poly2 = mpp::identity<mpp::Poly<int>,mpp::op_mul>::get();
-        EXPECT_TRUE(poly1 == poly2);
+        using identity = mpp::identity<mpp::Poly<int>,mpp::op_mul>;
+        auto has = identity::has();
+        EXPECT_TRUE(has);
+
+        auto const poly = mpp::Poly<int>{1};
+
+        auto poly1 = identity::get();
+        EXPECT_TRUE(poly1 == poly);
+
+        auto poly2 = mpp::Poly<int>{1,2,3};
+        identity::make(poly2);
+        EXPECT_TRUE(poly2 == poly);
     }
     {
-        // TODO: test mathpp inverse of polynomials
+        using inverse = mpp::inverse<mpp::Poly<int>,mpp::op_add>;
+        auto has = inverse::has();
+        EXPECT_TRUE(has);
+
+        auto const poly = mpp::Poly<int>{-1,-2,-3};
+
+        auto poly1 = mpp::Poly<int>{1,2,3};
+        auto can = inverse::can(poly1);
+        EXPECT_TRUE(can);
+
+        auto poly2 = inverse::get(poly1);
+        EXPECT_TRUE(poly2 == poly);
+
+        inverse::make(poly1);
+        EXPECT_TRUE(poly1 == poly);
     }
     {
-        // TODO: test mathpp absolute of polynomials
+        // Polynomials do not have multiplicative inverses
+        using inverse = mpp::inverse<mpp::Poly<int>,mpp::op_mul>;
+        auto has = inverse::has();
+        EXPECT_FALSE(has);
     }
     {
-        // TODO: test mathpp euclidean division of polynomials
+        using absolute = mpp::absolute<mpp::Poly<int>,op_add>;
+        auto has = absolute::has();
+        EXPECT_TRUE(has);
+
+        auto const poly = mpp::Poly<int>{1,2,3};
+
+        auto poly1 = mpp::Poly<int>{-1,-2,-3};
+        auto can = absolute::can(poly1);
+        EXPECT_TRUE(can);
+
+        auto poly2 = absolute::get(poly1);
+        EXPECT_TRUE(poly2 == poly);
+
+        absolute::make(poly1);
+        EXPECT_TRUE(poly1 == poly);
+    }
+    {
+        // Polynomials do not have multiplicative inverses
+        using absolute = mpp::absolute<mpp::Poly<int>,mpp::op_mul>;
+        auto has = absolute::has();
+        EXPECT_FALSE(has);
+    }
+    {
+        // TODO: test mathpp modulo of polynomials
+    }
+    {
+        using division = mpp::division<mpp::Poly<int>,mpp::Poly<int>>;
+        auto has = division::has();
+        EXPECT_TRUE(has);
+
+        auto const poly_a = mpp::Poly<int>{2,5,7,6};
+        auto const poly_b = mpp::Poly<int>{1,2,3};
+        auto can = division::can(poly_a,poly_b);
+        EXPECT_TRUE(can);
+
+        auto const poly_q = mpp::Poly<int>{1,2};
+        auto const poly_r = mpp::Poly<int>{1,1};
+        auto [q,r] = division::get(poly_a,poly_b);
+        EXPECT_TRUE(q == poly_q);
+        EXPECT_TRUE(r == poly_r);
     }
 }
 

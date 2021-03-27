@@ -76,28 +76,59 @@ TEST(MPP_MOD, MATHPP)
 {
     using mpp::op_add;  using mpp::op_mul;
     {
-        auto mod = mpp::identity<mpp::Mod<int>,op_add>::get(7);
-        EXPECT_EQ(mod.value(), 0);
+        using identity = mpp::identity<mpp::Mod<int>,op_add>;
+        auto has = identity::has();
+        EXPECT_TRUE(has);
+
+        auto mod = mpp::Mod<int>{7,0};
+
+        auto mod1 = identity::get(7); // 0  (mod 7)
+        EXPECT_EQ(mod1.value(), 0);
+
+        auto mod2 = mpp::Mod<int>{7,3};
+        identity::make(mod2);
+        EXPECT_EQ(mod2.value(), 0);
     }
     {
-        auto mod = mpp::identity<mpp::Mod<int>,op_mul>::get(7);
-        EXPECT_EQ(mod.value(), 1);
+        using identity = mpp::identity<mpp::Mod<int>,op_mul>;
+        auto has = identity::has();
+        EXPECT_TRUE(has);
+
+        auto mod1 = identity::get(7); // 0  (mod 7)
+        EXPECT_EQ(mod1.value(), 1);
+
+        auto mod2 = mpp::Mod<int>{7,3};
+        identity::make(mod2);
+        EXPECT_EQ(mod2.value(), 1);
     }
     {
-        auto mod1 = mpp::Mod<int>{7,3};
-        auto mod2 = mpp::inverse<mpp::Mod<int>,op_add>::get(mod1);
-        EXPECT_EQ(mod2.value(), 4); // 3+4 = 0  (mod 7)
+        using inverse = mpp::inverse<mpp::Mod<int>,op_add>;
+        auto has = inverse::has();
+        EXPECT_TRUE(has);
+
+        auto const mod = mpp::Mod<int>{7,2};
+
+        auto mod1 = mpp::Mod<int>{7,5};
+        auto can = inverse::can(mod1);
+        EXPECT_TRUE(can);
+
+        auto mod2 = inverse::get(mod1);
+        EXPECT_TRUE(mod2 == mod);
+
+        inverse::make(mod1);
+        EXPECT_TRUE(mod1 == mod);
     }
     {
-        auto mod1 = mpp::Mod<int>{7,3};
-        auto mod2 = mpp::inverse<mpp::Mod<int>,op_mul>::get(mod1);
-        EXPECT_EQ(mod2.value(), 5); // 5x3 = 15 = 1  (mod 7)
+        
     }
     {
         // TODO: test mathpp absolute of modulo
     }
     {
-        // TODO: test mathpp euclidean division of modulo
+        // TODO: test mathpp modulo of modulo
+    }
+    {
+        // TODO: test mathpp division of modulo
     }
 }
 

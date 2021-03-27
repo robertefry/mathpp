@@ -111,9 +111,9 @@ namespace mpp
         {
             return true;
         }
-        constexpr static bool can(Tp)
+        constexpr static bool can(mpp::Poly<Tp> const&)
         {
-            return has();
+            return true;
         }
         static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
         {
@@ -125,35 +125,41 @@ namespace mpp
         }
     };
 
-    template <typename Tp, typename Op>
-    struct absolute<mpp::Poly<Tp>,Op>
+    // template <typename Tp, typename Op>
+    // struct absolute<mpp::Poly<Tp>,Op>
+    // {
+    //     // use mathpp default
+    // };
+
+    template <typename Tp, typename Tq>
+    struct modulo<mpp::Poly<Tp>,mpp::Poly<Tq>>
     {
         constexpr static bool has()
         {
-            return true;
+            return std::is_convertible<Tq,Tp>::value;
         }
-        constexpr static bool can(Tp)
+        constexpr static bool can(mpp::Poly<Tp> const&, mpp::Poly<Tq> const&)
         {
             return has();
         }
-        static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
+        static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e, mpp::Poly<Tq> const& n)
         {
-            using identity = mpp::identity<mpp::Poly<Tp>,Op>;
-            using inverse = mpp::inverse<mpp::Poly<Tp>,Op>;
-            return (e < identity::get()) ? inverse::get(e) : e;
+            auto copy = e;
+            return make(copy,n);
         }
-        static mpp::Poly<Tp> make(mpp::Poly<Tp>& e)
+        static mpp::Poly<Tp>& make(mpp::Poly<Tp>& e, mpp::Poly<Tq> const& n)
         {
-            using identity = mpp::identity<mpp::Poly<Tp>,Op>;
-            using inverse = mpp::inverse<mpp::Poly<Tp>,Op>;
-            return (e < identity::get()) ? inverse::make(e) : e;
-        }
-    };
+            auto const conv = n - (mpp::Poly<Tq>{n.coeffs().back()} <<= n.order());
 
-    template <typename Tp>
-    struct modulo<mpp::Poly<Tp>>
-    {
-        // TODO: modulo<mpp::Poly<Tp>>
+            while (e.order() >= n.order())
+            {
+                auto const order = e.order();
+                auto const coeff = e.coeffs().back();
+                e -= mpp::Poly<Tp>{coeff} <<= order;
+                e += coeff * conv;
+            }
+            return e;
+        }
     };
 
     template <typename Tp, typename Tq>
@@ -163,11 +169,11 @@ namespace mpp
         {
             return true;
         }
-        constexpr static bool can(Tp)
+        constexpr static bool can(mpp::Poly<Tp> const&, mpp::Poly<Tp> const&)
         {
             return has();
         }
-        static auto euclidean(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
+        static auto get(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
         {
             using Tr = decltype(poly1[0]/poly2[0]);
             mpp::Poly<Tr> quotient;
@@ -183,10 +189,6 @@ namespace mpp
                 remainder -= term * poly2;
             }
             return std::make_tuple(quotient,remainder);
-        }
-        static auto get(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
-        {
-            return euclidean(poly1,poly2);
         }
     };
 
@@ -376,7 +378,7 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator%=(Tp const& c)
 {
     for (Tp& coeff : m_Coefficients)
     {
-        mpp::modulo<Tp>::make(coeff,c);
+        mpp::modulo<Tp,Tp>::make(coeff,c);
     }
     validate();
     return *this;
@@ -480,7 +482,8 @@ bool operator==(mpp::Poly<Tp> const& poly1, mpp::Poly<Tp> const& poly2)
 }
 
 template <typename Tp, typename Tq>
-std::compare_three_way_result_t<Tp,Tq> operator<=>(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
+auto operator<=>(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
+    -> std::compare_three_way_result_t<Tp,Tq>
 {
     using mpp::op_add;  using mpp::op_mul;
     if (poly1.order() > poly2.order()) return poly1.coeffs().back() <=> mpp::identity<Tp,op_add>::get();
@@ -519,30 +522,28 @@ template <typename Tp>
 auto operator+(mpp::Poly<Tp> const& poly)
 {
     using mpp::op_add;  using mpp::op_mul;
-    using Tr = decltype(mpp::identity<Tp,op_add>::get()+poly[0]);
-    std::vector<Tr> coeffs;
+    std::vector<Tp> coeffs;
     coeffs.reserve(poly.size());
 
     for (auto const& coeff : poly.coeffs())
     {
         coeffs.push_back(mpp::identity<Tp,op_add>::get()+coeff);
     }
-    return mpp::Poly<Tr>{coeffs};
+    return mpp::Poly<Tp>{coeffs};
 }
 
 template <typename Tp>
 auto operator-(mpp::Poly<Tp> const& poly)
 {
     using mpp::op_add;  using mpp::op_mul;
-    using Tr = decltype(mpp::identity<Tp,op_add>::get()-poly[0]);
-    std::vector<Tr> coeffs;
+    std::vector<Tp> coeffs;
     coeffs.reserve(poly.size());
 
     for (auto const& coeff : poly.coeffs())
     {
         coeffs.push_back(mpp::identity<Tp,op_add>::get()-coeff);
     }
-    return mpp::Poly<Tr>{coeffs};
+    return mpp::Poly<Tp>{coeffs};
 }
 
 template <typename Tp>
@@ -580,43 +581,40 @@ auto operator-(Tp const& c, mpp::Poly<Tp> const& poly)
 template <typename Tp>
 auto operator*(mpp::Poly<Tp> const& poly, Tp const& c)
 {
-    using Tr = decltype(poly[0]*c);
-    std::vector<Tr> coeffs;
+    std::vector<Tp> coeffs;
     coeffs.reserve(poly.size());
 
     for (Tp const& coeff : poly)
     {
         coeffs.push_back(coeff*c);
     }
-    return mpp::Poly<Tr>{coeffs};
+    return mpp::Poly<Tp>{coeffs};
 }
 
 template <typename Tp>
 auto operator*(Tp const& c, mpp::Poly<Tp> const& poly)
 {
-    using Tr = decltype(c*poly[0]);
-    std::vector<Tr> coeffs;
+    std::vector<Tp> coeffs;
     coeffs.reserve(poly.size());
 
     for (Tp const& coeff : poly)
     {
         coeffs.push_back(c*coeff);
     }
-    return mpp::Poly<Tr>{coeffs};
+    return mpp::Poly<Tp>{coeffs};
 }
 
 template <typename Tp>
 auto operator/(mpp::Poly<Tp> const& poly, Tp const& c)
 {
-    using Tr = decltype(poly[0]/c);
-    std::vector<Tr> coeffs;
+    std::vector<Tp> coeffs;
     coeffs.reserve(poly.size());
 
     for (Tp const& coeff : poly)
     {
         coeffs.push_back(coeff/c);
     }
-    return mpp::Poly<Tr>{coeffs};
+    return mpp::Poly<Tp>{coeffs};
 }
 
 template <typename Tp>
@@ -627,7 +625,7 @@ auto operator%(mpp::Poly<Tp> const& poly, Tp const& c)
 
     for (Tp const& coeff : poly)
     {
-        coeffs.push_back(mpp::modulo<Tp>::get(coeff,c));
+        coeffs.push_back(mpp::modulo<Tp,Tp>::get(coeff,c));
     }
     return mpp::Poly<Tp>{coeffs};
 }
