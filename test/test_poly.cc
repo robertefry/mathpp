@@ -188,11 +188,12 @@ TEST(MPP_POLY, MATHPP)
         auto can = division::can(poly_a,poly_b);
         EXPECT_TRUE(can);
 
-        auto const poly_q = mpp::Poly<int>{1,2};
+        // a = r + s * b
         auto const poly_r = mpp::Poly<int>{1,1};
-        auto [q,r] = division::get(poly_a,poly_b);
-        EXPECT_TRUE(q == poly_q);
+        auto const poly_s = mpp::Poly<int>{1,2};
+        auto [r,s] = division::get(poly_a,poly_b);
         EXPECT_TRUE(r == poly_r);
+        EXPECT_TRUE(s == poly_s);
     }
 }
 

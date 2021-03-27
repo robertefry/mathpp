@@ -322,9 +322,9 @@ namespace mpp
         }
         static auto get(Tp const& dividend, Tq const& divisor)
         {
-            auto quotient = dividend / divisor;
-            auto remainder = dividend - quotient * divisor;
-            return std::make_tuple(quotient,remainder);
+            auto s = dividend / divisor;
+            auto r = dividend - s * divisor;
+            return std::make_tuple(r,s);
         }
     };
 

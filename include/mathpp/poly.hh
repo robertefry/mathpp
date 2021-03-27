@@ -199,8 +199,8 @@ namespace mpp
         static auto get(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
         {
             using Tr = decltype(poly1[0]/poly2[0]);
-            mpp::Poly<Tr> quotient;
             mpp::Poly<Tr> remainder = poly1;
+            mpp::Poly<Tr> quotient;
 
             using abs = mpp::absolute<mpp::Poly<Tp>,op_add>;
             while (abs::get(remainder) >= abs::get(poly2))
@@ -208,10 +208,10 @@ namespace mpp
                 auto const coeff = remainder.coeffs().back() / poly2.coeffs().back();
                 auto const power = remainder.order() - poly2.order();
                 auto const term = mpp::Poly<Tr>{coeff} >>= power;
-                quotient += term;
                 remainder -= term * poly2;
+                quotient += term;
             }
-            return std::make_tuple(quotient,remainder);
+            return std::make_tuple(remainder,quotient);
         }
     };
 
@@ -724,14 +724,14 @@ template <typename Tp, typename Tq>
 auto operator/(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 {
     using division = mpp::division<mpp::Poly<Tp>,mpp::Poly<Tq>>;
-    return std::get<0>(division::get(poly1,poly2));
+    return std::get<1>(division::get(poly1,poly2));
 }
 
 template <typename Tp, typename Tq>
 auto operator%(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 {
     using division = mpp::division<mpp::Poly<Tp>,mpp::Poly<Tq>>;
-    return std::get<1>(division::get(poly1,poly2));
+    return std::get<0>(division::get(poly1,poly2));
 }
 
 /* ************************************************************************** */

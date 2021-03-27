@@ -315,23 +315,23 @@ TEST(MATHPP, PRIMITIVE_MODULO)
 TEST(MATHPP, PRIMITIVE_DIVISION)
 {
     {
-        auto [q,r] = mpp::division<int,int>::get(13,5);
-        EXPECT_EQ(q,2);
+        auto [r,s] = mpp::division<int,int>::get(13,5);
         EXPECT_EQ(r,3);
+        EXPECT_EQ(s,2);
     }
     {
-        auto [q,r] = mpp::division<int,float>::get(13,5);
-        EXPECT_EQ(q,2.6f);
+        auto [r,s] = mpp::division<int,float>::get(13,5);
         EXPECT_EQ(r,0.0f);
+        EXPECT_EQ(s,2.6f);
     }
     {
-        auto [q,r] = mpp::division<float,int>::get(13,5);
-        EXPECT_EQ(q,2.6f);
+        auto [r,s] = mpp::division<float,int>::get(13,5);
         EXPECT_EQ(r,0.0f);
+        EXPECT_EQ(s,2.6f);
     }
     {
-        auto [q,r] = mpp::division<float,float>::get(13,5);
-        EXPECT_EQ(q,2.6f);
+        auto [r,s] = mpp::division<float,float>::get(13,5);
         EXPECT_EQ(r,0.0f);
+        EXPECT_EQ(s,2.6f);
     }
 }

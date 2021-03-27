@@ -208,10 +208,10 @@ namespace mpp
         static auto get(mpp::Mod<Tp> const& a, mpp::Mod<Tq> const& b)
         {
             auto const gcd = mpp::gcd<Tp>(a.modulus(),b.modulus());
-            auto [q,r] = mpp::division<Tp,Tq>::get(a.value(),b.value());
+            auto [r,s] = mpp::division<Tp,Tq>::get(a.value(),b.value());
 
-            using Tr = decltype(q); using Ts = decltype(r);
-            return std::make_tuple(mpp::Mod<Tr>{gcd,q},mpp::Mod<Ts>{gcd,r});
+            using Tr = decltype(r); using Ts = decltype(s);
+            return std::make_tuple(mpp::Mod<Tr>{gcd,r},mpp::Mod<Ts>{gcd,s});
         }
     };
 
