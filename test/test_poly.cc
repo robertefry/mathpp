@@ -305,12 +305,12 @@ TEST(MPP_POLY, MATH_SELF)
         auto poly1 = mpp::Poly<int>{1,2,3,4,5};
 
         auto poly2 = mpp::Poly<int>{3,4,5};
-        EXPECT_TRUE((poly1 << 2) == poly2);
-        EXPECT_TRUE((poly1 <<= 2) == poly2);
+        EXPECT_TRUE((poly1 >> 2) == poly2);
+        EXPECT_TRUE((poly1 >>= 2) == poly2);
 
         auto poly3 = mpp::Poly<int>{0,0,3,4,5};
-        EXPECT_TRUE((poly1 >> 2) == poly3);
-        EXPECT_TRUE((poly1 >>= 2) == poly3);
+        EXPECT_TRUE((poly1 << 2) == poly3);
+        EXPECT_TRUE((poly1 <<= 2) == poly3);
     }
     {
         auto poly1 = mpp::Poly<int>{5,1};           // 5+x

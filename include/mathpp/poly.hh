@@ -208,8 +208,8 @@ namespace mpp
             while (e.order() >= n.order())
             {
                 auto const coeff = e.coeffs().back();
-                e -= mpp::Poly<Tp>{coeff} >>= e.order();
-                e += (coeff * c_poly) >>= (e.order() - n.order() + 1);
+                e -= mpp::Poly<Tp>{coeff} <<= e.order();
+                e += (coeff * c_poly) <<= (e.order() - n.order() + 1);
             }
             return e;
         }
@@ -262,7 +262,7 @@ namespace mpp
             {
                 auto const coeff = remainder.coeffs().back() / poly2.coeffs().back();
                 auto const power = remainder.order() - poly2.order();
-                auto const term = mpp::Poly<Tr>{coeff} >>= power;
+                auto const term = mpp::Poly<Tr>{coeff} <<= power;
                 remainder -= term * poly2;
                 quotient += term;
             }
@@ -391,7 +391,7 @@ void mpp::Poly<Tp>::clear()
 }
 
 template <typename Tp>
-mpp::Poly<Tp>& mpp::Poly<Tp>::operator<<=(size_t n)
+mpp::Poly<Tp>& mpp::Poly<Tp>::operator>>=(size_t n)
 {
     if (size() <= n)
     {
@@ -406,7 +406,7 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator<<=(size_t n)
 }
 
 template <typename Tp>
-mpp::Poly<Tp>& mpp::Poly<Tp>::operator>>=(size_t n)
+mpp::Poly<Tp>& mpp::Poly<Tp>::operator<<=(size_t n)
 {
     m_Coefficients.insert(m_Coefficients.begin(), n, mpp::identity<Tp,op_add>::get());
     validate();
@@ -515,7 +515,7 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator/=(Poly<Tq> const& other)
     {
         auto const coeff = coeffs().back() / other.coeffs().back();
         auto const power = order() - other.order();
-        auto const term = mpp::Poly<Tp>{coeff} >>= power;
+        auto const term = mpp::Poly<Tp>{coeff} <<= power;
         quotient += term;
         *this -= term * other;
     }
@@ -531,7 +531,7 @@ mpp::Poly<Tp>& mpp::Poly<Tp>::operator%=(Poly<Tq> const& other)
     {
         auto const coeff = coeffs().back() / other.coeffs().back();
         auto const power = order() - other.order();
-        auto const term = mpp::Poly<Tp>{coeff} >>= power;
+        auto const term = mpp::Poly<Tp>{coeff} <<= power;
         *this -= other * term;
     }
     return *this;
@@ -577,7 +577,7 @@ auto operator<=>(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
 }
 
 template <typename Tp>
-auto operator<<(mpp::Poly<Tp> const& poly, size_t n)
+auto operator>>(mpp::Poly<Tp> const& poly, size_t n)
 {
     if (poly.size() <= n) {
         return mpp::Poly<Tp>{};
@@ -588,7 +588,7 @@ auto operator<<(mpp::Poly<Tp> const& poly, size_t n)
 }
 
 template <typename Tp>
-auto operator>>(mpp::Poly<Tp> const& poly, size_t n)
+auto operator<<(mpp::Poly<Tp> const& poly, size_t n)
 {
     using mpp::op_add;  using mpp::op_mul;
     auto coeffs = std::vector<Tp>(n,mpp::identity<Tp,op_add>::get());
