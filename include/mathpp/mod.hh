@@ -94,9 +94,9 @@ namespace mpp
     template <typename Tp, typename Op>
     struct identity<mpp::Mod<Tp>,Op>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return mpp::identity<Tp,Op>::has();
         }
         static mpp::Mod<Tp> get(Tp const& mod)
         {
@@ -111,13 +111,13 @@ namespace mpp
     template <typename Tp>
     struct inverse<mpp::Mod<Tp>,op_add>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return tristate::all;
         }
         constexpr static bool can(mpp::Mod<Tp> const&)
         {
-            return has();
+            return true;
         }
         static mpp::Mod<Tp> get(mpp::Mod<Tp> const& e)
         {
@@ -132,9 +132,9 @@ namespace mpp
     template <typename Tp>
     struct inverse<mpp::Mod<Tp>,op_mul>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return tristate::some;
         }
         constexpr static bool can(mpp::Mod<Tp> const& e)
         {
@@ -157,9 +157,9 @@ namespace mpp
     template <typename Tp, typename Op>
     struct absolute<mpp::Mod<Tp>,Op>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return tristate::all;
         }
         constexpr static bool can(Tp const&)
         {
@@ -176,32 +176,16 @@ namespace mpp
     };
 
     template <typename Tp, typename Tq>
-    struct modulo<mpp::Mod<Tp>,Tq>
-    {
-        constexpr static bool has()
-        {
-            return true;
-        }
-        constexpr static bool can(mpp::Mod<Tp> const&, Tq const&)
-        {
-            return std::is_convertible<Tq,Tp>::value;
-        }
-        static mpp::Mod<Tp> get(mpp::Mod<Tp> const& e, Tp const& n)
-        {
-            return mpp::Mod<Tp>{n,e.value()};
-        }
-    };
-
-    template <typename Tp, typename Tq>
+        requires std::is_convertible<Tq,Tp>::value
     struct modulo<mpp::Mod<Tp>,mpp::Mod<Tq>>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return tristate::all;
         }
         constexpr static bool can(mpp::Mod<Tp> const&, mpp::Mod<Tq> const&)
         {
-            return std::is_convertible<Tq,Tp>::value;
+            return true;
         }
         static mpp::Mod<Tp> get(mpp::Mod<Tp> const& e, mpp::Mod<Tq> const& n)
         {
@@ -209,11 +193,27 @@ namespace mpp
         }
     };
 
-    // template <typename Tp, typename Tq>
-    // struct division<mpp::Mod<Tp>,mpp::Mod<Tq>>
-    // {
-    //     // TODO division<mpp::Mod<Tp>,mpp::Mod<Tq>>
-    // };
+    template <typename Tp, typename Tq>
+        requires std::is_convertible<Tq,Tp>::value
+    struct division<mpp::Mod<Tp>,mpp::Mod<Tq>>
+    {
+        constexpr static tristate has()
+        {
+            return mpp::division<Tp,Tq>::has();
+        }
+        constexpr static bool can(mpp::Mod<Tp> const& a, mpp::Mod<Tq> const& b)
+        {
+            return mpp::division<Tp,Tq>::can(a.value(),b.value());
+        }
+        static auto get(mpp::Mod<Tp> const& a, mpp::Mod<Tq> const& b)
+        {
+            auto const gcd = mpp::gcd<Tp>(a.modulus(),b.modulus());
+            auto [q,r] = mpp::division<Tp,Tq>::get(a.value(),b.value());
+
+            using Tr = decltype(q); using Ts = decltype(r);
+            return std::make_tuple(mpp::Mod<Tr>{gcd,q},mpp::Mod<Ts>{gcd,r});
+        }
+    };
 
 } // namespace mpp
 

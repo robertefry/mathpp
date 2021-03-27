@@ -78,7 +78,7 @@ TEST(MPP_MOD, MATHPP)
     {
         using identity = mpp::identity<mpp::Mod<int>,op_add>;
         auto has = identity::has();
-        EXPECT_TRUE(has);
+        EXPECT_TRUE(has == mpp::tristate::all);
 
         auto mod = mpp::Mod<int>{7,0};
 
@@ -92,9 +92,9 @@ TEST(MPP_MOD, MATHPP)
     {
         using identity = mpp::identity<mpp::Mod<int>,op_mul>;
         auto has = identity::has();
-        EXPECT_TRUE(has);
+        EXPECT_TRUE(has == mpp::tristate::all);
 
-        auto mod1 = identity::get(7); // 0  (mod 7)
+        auto mod1 = identity::get(7); // 1  (mod 7)
         EXPECT_EQ(mod1.value(), 1);
 
         auto mod2 = mpp::Mod<int>{7,3};
@@ -104,7 +104,7 @@ TEST(MPP_MOD, MATHPP)
     {
         using inverse = mpp::inverse<mpp::Mod<int>,op_add>;
         auto has = inverse::has();
-        EXPECT_TRUE(has);
+        EXPECT_TRUE(has == mpp::tristate::all);
 
         auto const mod = mpp::Mod<int>{7,2};
 
@@ -119,7 +119,7 @@ TEST(MPP_MOD, MATHPP)
         EXPECT_TRUE(mod1 == mod);
     }
     {
-        
+        // TODO: test mathpp multiplicative inverse of modulo
     }
     {
         // TODO: test mathpp absolute of modulo

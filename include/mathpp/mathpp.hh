@@ -33,6 +33,11 @@ namespace mpp
 namespace mpp
 {
 
+    enum struct tristate
+    {
+        all, some, none
+    };
+
     /*
      * All helpers should have the following functions, where appropriate.
      *  `has`   - Determines if possible for the template parameters.
@@ -70,9 +75,9 @@ namespace mpp
     template <typename Tp, typename Op>
     struct identity
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return false;
+            return tristate::none;
         }
     };
 
@@ -81,13 +86,13 @@ namespace mpp
     template <typename Tp, typename Op>
     struct inverse
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return false;
+            return tristate::none;
         }
         constexpr static bool can(Tp const&)
         {
-            return has();
+            return false;
         }
     };
 
@@ -96,29 +101,13 @@ namespace mpp
     template <typename Tp, typename Op>
     struct absolute
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return mpp::identity<Tp,Op>::has() && mpp::inverse<Tp,Op>::has();
+            return tristate::none;
         }
         constexpr static bool can(Tp const&)
         {
-            return has();
-        }
-        static Tp get(Tp e)
-        {
-            if (e < mpp::identity<Tp,Op>::get())
-            {
-                return mpp::inverse<Tp,Op>::get(e);
-            }
-            return e;
-        }
-        static Tp& make(Tp& e)
-        {
-            if (e < mpp::identity<Tp,Op>::get())
-            {
-                return mpp::inverse<Tp,Op>::make(e);
-            }
-            return e;
+            return false;
         }
     };
 
@@ -127,9 +116,9 @@ namespace mpp
     template <typename Tp, typename Tq>
     struct modulo
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return false;
+            return tristate::none;
         }
         constexpr static bool can(Tp const&, Tq const&)
         {
@@ -142,19 +131,13 @@ namespace mpp
     template <typename Tp, typename Tq>
     struct division
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return tristate::none;
         }
         constexpr static bool can(Tp const&, Tq const&)
         {
-            return has();
-        }
-        static auto get(Tp const& dividend, Tq const& divisor)
-        {
-            auto quotient = dividend / divisor;
-            auto remainder = dividend - quotient * divisor;
-            return std::make_tuple(quotient,remainder);
+            return false;
         }
     };
 
@@ -173,9 +156,9 @@ namespace mpp
         requires std::is_arithmetic<Tp>::value
     struct identity<Tp,op_add>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return tristate::all;
         }
         static Tp get()
         {
@@ -191,9 +174,9 @@ namespace mpp
         requires std::is_arithmetic<Tp>::value
     struct identity<Tp,op_mul>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return tristate::all;
         }
         static Tp get()
         {
@@ -211,13 +194,13 @@ namespace mpp
         requires std::is_signed<Tp>::value
     struct inverse<Tp,op_add>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(Tp const&)
         {
             return true;
-        }
-        constexpr static bool can(Tp)
-        {
-            return has();
         }
         static Tp get(Tp e)
         {
@@ -233,13 +216,13 @@ namespace mpp
         requires std::is_floating_point<Tp>::value
     struct inverse<Tp,op_mul>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(Tp const&)
         {
             return true;
-        }
-        constexpr static bool can(Tp)
-        {
-            return has();
         }
         static Tp get(Tp e)
         {
@@ -251,6 +234,52 @@ namespace mpp
         }
     };
 
+    // absolute
+
+    template <typename Tp>
+        requires std::is_arithmetic<Tp>::value
+    struct absolute<Tp,op_add>
+    {
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(Tp const&)
+        {
+            return true;
+        }
+        static Tp get(Tp e)
+        {
+            return (e < 0) ? -e : e;
+        }
+        static Tp& make(Tp& e)
+        {
+            return (e < 0) ? e *= -1 : e;
+        }
+    };
+
+    template <typename Tp>
+        requires std::is_floating_point<Tp>::value
+    struct absolute<Tp,op_mul>
+    {
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(Tp const&)
+        {
+            return true;
+        }
+        static Tp get(Tp e)
+        {
+            return (absolute<Tp,op_add>::get(e) > 1) ? 1/e : e;
+        }
+        static Tp& make(Tp& e)
+        {
+            return (absolute<Tp,op_add>::get(e) > 1) ? e = 1/e : e;
+        }
+    };
+
     // modulo
 
     template <typename Tp, typename Tq>
@@ -258,13 +287,13 @@ namespace mpp
             && std::is_arithmetic<Tq>::value
     struct modulo<Tp,Tq>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(Tp const&, Tq const&)
         {
             return true;
-        }
-        constexpr static bool can(Tp, Tq)
-        {
-            return has();
         }
         static Tp get(Tp e, Tq n)
         {
@@ -273,6 +302,29 @@ namespace mpp
         static Tp& make(Tp& e, Tq n)
         {
             return e = get(e,n);
+        }
+    };
+
+    // division
+
+    template <typename Tp, typename Tq>
+        requires std::is_arithmetic<Tp>::value
+            && std::is_arithmetic<Tq>::value
+    struct division<Tp,Tq>
+    {
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(Tp const&, Tq const&)
+        {
+            return true;
+        }
+        static auto get(Tp const& dividend, Tq const& divisor)
+        {
+            auto quotient = dividend / divisor;
+            auto remainder = dividend - quotient * divisor;
+            return std::make_tuple(quotient,remainder);
         }
     };
 

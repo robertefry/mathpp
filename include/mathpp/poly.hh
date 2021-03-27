@@ -89,9 +89,9 @@ namespace mpp
     template <typename Tp, typename Op>
     struct identity<mpp::Poly<Tp>,Op>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return identity<Tp,Op>::has();
         }
         static mpp::Poly<Tp> const& get()
         {
@@ -107,12 +107,16 @@ namespace mpp
     template <typename Tp>
     struct inverse<mpp::Poly<Tp>,op_add>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return true;
+            return mpp::inverse<Tp,op_add>::has();
         }
-        constexpr static bool can(mpp::Poly<Tp> const&)
+        constexpr static bool can(mpp::Poly<Tp> const& e)
         {
+            for (auto const& coeff : e.coeffs())
+            {
+                if (mpp::inverse<Tp,op_add>::can(coeff) == false) return false;
+            }
             return true;
         }
         static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
@@ -125,22 +129,41 @@ namespace mpp
         }
     };
 
-    // template <typename Tp, typename Op>
-    // struct absolute<mpp::Poly<Tp>,Op>
-    // {
-    //     // use mathpp default
-    // };
+    template <typename Tp>
+    struct absolute<mpp::Poly<Tp>,op_add>
+    {
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(mpp::Poly<Tp> const&)
+        {
+            return true;
+        }
+        static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e)
+        {
+            auto const negative = e.coeffs().back() < mpp::identity<Tp,op_add>::get();
+            return negative ? -e : e;
+        }
+        static mpp::Poly<Tp>& make(mpp::Poly<Tp>& e)
+        {
+            auto const negative = e.coeffs().back() < mpp::identity<Tp,op_add>::get();
+            if (negative) e *= mpp::inverse<Tp,op_add>::get(mpp::identity<Tp,op_mul>::get());
+            return e;
+        }
+    };
 
     template <typename Tp, typename Tq>
+        requires std::is_convertible<Tq,Tp>::value
     struct modulo<mpp::Poly<Tp>,mpp::Poly<Tq>>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
         {
-            return std::is_convertible<Tq,Tp>::value;
+            return tristate::all;
         }
         constexpr static bool can(mpp::Poly<Tp> const&, mpp::Poly<Tq> const&)
         {
-            return has();
+            return true;
         }
         static mpp::Poly<Tp> get(mpp::Poly<Tp> const& e, mpp::Poly<Tq> const& n)
         {
@@ -165,13 +188,13 @@ namespace mpp
     template <typename Tp, typename Tq>
     struct division<mpp::Poly<Tp>,mpp::Poly<Tq>>
     {
-        constexpr static bool has()
+        constexpr static tristate has()
+        {
+            return tristate::all;
+        }
+        constexpr static bool can(mpp::Poly<Tp> const&, mpp::Poly<Tq> const&)
         {
             return true;
-        }
-        constexpr static bool can(mpp::Poly<Tp> const&, mpp::Poly<Tp> const&)
-        {
-            return has();
         }
         static auto get(mpp::Poly<Tp> const& poly1, mpp::Poly<Tq> const& poly2)
         {
