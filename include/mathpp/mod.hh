@@ -98,9 +98,10 @@ namespace mpp
         {
             return mpp::identity<Tp,Op>::has();
         }
-        static mpp::Mod<Tp> get(Tp const& mod)
+        static mpp::Mod<Tp> const& get(Tp const& mod)
         {
-            return mpp::Mod<Tp>{mod,identity<Tp,Op>::get()};
+            static auto const s_ident = mpp::Mod<Tp>{mod,identity<Tp,Op>::get()};
+            return s_ident;
         }
         static mpp::Mod<Tp>& make(mpp::Mod<Tp>& e)
         {

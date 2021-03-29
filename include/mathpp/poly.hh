@@ -98,7 +98,7 @@ namespace mpp
         }
         static mpp::Poly<Tp> const& get()
         {
-            static mpp::Poly<Tp> s_ident = mpp::Poly<Tp>{identity<Tp,Op>::get()};
+            static auto const s_ident = mpp::Poly<Tp>{identity<Tp,Op>::get()};
             return s_ident;
         }
         static mpp::Poly<Tp>& make(mpp::Poly<Tp>& poly)
