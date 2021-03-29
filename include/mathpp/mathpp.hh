@@ -27,7 +27,7 @@ namespace mpp
 } // namespace mpp
 
 /* ************************************************************************** */
-// Math Helper Definitions
+// Logic Definitions
 /* ************************************************************************** */
 
 namespace mpp
@@ -37,6 +37,15 @@ namespace mpp
     {
         all, some, none
     };
+
+} // namespace mpp
+
+/* ************************************************************************** */
+// Math Helper Definitions
+/* ************************************************************************** */
+
+namespace mpp
+{
 
     /*
      * All helpers should have the following functions, where appropriate.
