@@ -19,9 +19,9 @@ namespace mpp
     class Mod
     {
     public:
-        Mod(Tp const&);
-        Mod(Tp const&, Tp const&);
-        Mod(Tp const&, Tp&&);
+        explicit Mod(Tp const&);
+        explicit Mod(Tp const&, Tp const&);
+        explicit Mod(Tp const&, Tp&&);
         virtual ~Mod() = default;
 
         template <typename Tq>
