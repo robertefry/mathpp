@@ -20,12 +20,13 @@ namespace mpp
     class Poly
     {
     public:
-        Poly();
-        Poly(size_t, Tp const&);
+        explicit Poly();
+        explicit Poly(size_t, Tp const&);
+        virtual ~Poly() = default;
+
+        Poly(std::initializer_list<Tp>);
         Poly(std::vector<Tp> const&);
         Poly(std::vector<Tp>&&);
-        Poly(std::initializer_list<Tp>);
-        virtual ~Poly() = default;
 
         template <typename Tq>
         Poly(Poly<Tq> const&);
@@ -41,12 +42,12 @@ namespace mpp
         virtual auto order() const -> size_t { return m_Coefficients.size()-1; }
         virtual auto size() const -> size_t { return m_Coefficients.size(); }
 
-        virtual void swap(Poly<Tp>& other);
+        virtual void swap(Poly<Tp>&);
         virtual void assign(size_t, Tp const&);
+        virtual void assign(std::initializer_list<Tp>);
         virtual void assign(std::vector<Tp> const&);
         virtual void assign(std::vector<Tp>&&);
-        virtual void assign(std::initializer_list<Tp>);
-        virtual void clear();
+        virtual void zero();
 
         virtual auto operator[](size_t i) const -> Tp const& { return m_Coefficients[i]; }
         virtual auto operator[](size_t i) -> Tp& { return m_Coefficients[i]; }
@@ -290,6 +291,13 @@ mpp::Poly<Tp>::Poly(size_t n, Tp const& val)
 }
 
 template <typename Tp>
+mpp::Poly<Tp>::Poly(std::initializer_list<Tp> coeffs)
+    : m_Coefficients{coeffs}
+{
+    validate();
+}
+
+template <typename Tp>
 mpp::Poly<Tp>::Poly(std::vector<Tp> const& coeffs)
     : m_Coefficients{coeffs}
 {
@@ -299,13 +307,6 @@ mpp::Poly<Tp>::Poly(std::vector<Tp> const& coeffs)
 template <typename Tp>
 mpp::Poly<Tp>::Poly(std::vector<Tp>&& coeffs)
     : m_Coefficients{std::move(coeffs)}
-{
-    validate();
-}
-
-template <typename Tp>
-mpp::Poly<Tp>::Poly(std::initializer_list<Tp> coeffs)
-    : m_Coefficients{coeffs}
 {
     validate();
 }
@@ -363,6 +364,13 @@ void mpp::Poly<Tp>::assign(size_t n, Tp const& val)
 }
 
 template <typename Tp>
+void mpp::Poly<Tp>::assign(std::initializer_list<Tp> coeffs)
+{
+    m_Coefficients = coeffs;
+    validate();
+}
+
+template <typename Tp>
 void mpp::Poly<Tp>::assign(std::vector<Tp> const& coeffs)
 {
     m_Coefficients = coeffs;
@@ -377,14 +385,7 @@ void mpp::Poly<Tp>::assign(std::vector<Tp>&& coeffs)
 }
 
 template <typename Tp>
-void mpp::Poly<Tp>::assign(std::initializer_list<Tp> coeffs)
-{
-    m_Coefficients = coeffs;
-    validate();
-}
-
-template <typename Tp>
-void mpp::Poly<Tp>::clear()
+void mpp::Poly<Tp>::zero()
 {
     m_Coefficients.clear();
     validate();
