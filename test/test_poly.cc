@@ -1,6 +1,8 @@
 
 #include "gtest/gtest.h"
+
 #include <mathpp/poly.hh>
+#include <mathpp/gcd.hh>
 
 TEST(MPP_POLY, LIFETIME)
 {
@@ -387,5 +389,45 @@ TEST(MPP_POLY, MATH_EXTRA)
         auto poly2 = mpp::Poly<int>{1,2,3};
         auto poly3 = mpp::Poly<int>{1,1};
         EXPECT_TRUE((poly1 % poly2) == poly3);
+    }
+}
+
+TEST(MPP_POLY, GCD)
+{
+    {
+        auto poly1 = mpp::Poly<int>{1,1} * mpp::Poly<int>{1,2}; // (1+x)(1+2x)
+        auto poly2 = mpp::Poly<int>{1,1} * mpp::Poly<int>{2,3}; // (1+x)(2+3x)
+        auto poly3 = mpp::Poly<int>{1,1};
+        auto gcd = mpp::gcd(poly1,poly2);
+        EXPECT_EQ(gcd.coeffs(), poly3.coeffs());  // gcd of (1+x)(1+2x) and (1+x)(2+3x) is (1+x)
+    }
+    {
+        auto poly1 = mpp::Poly<int>{1,1} * mpp::Poly<int>{1,2}; // (1+x)(1+2x)
+        auto poly2 = mpp::Poly<int>{1,1} * mpp::Poly<int>{2,3}; // (1+x)(2+3x)
+        auto poly3 = mpp::Poly<int>{1,1};
+        auto gcd = mpp::gcd(poly2,poly1);
+        EXPECT_EQ(gcd.coeffs(), poly3.coeffs());  // gcd of (1+x)(1+2x) and (1+x)(2+3x) is (1+x)
+    }
+}
+
+TEST(MPP_POLY, GCD_EXTENDED)
+{
+    {
+        auto poly1 = mpp::Poly<int>{1,1} * mpp::Poly<int>{1,2}; // (1+x)(1+2x)
+        auto poly2 = mpp::Poly<int>{1,1} * mpp::Poly<int>{2,3}; // (1+x)(2+3x)
+        auto poly3 = mpp::Poly<int>{-3};
+        auto poly4 = mpp::Poly<int>{2};
+        auto [x,y] = mpp::gcd_extended(poly2,poly1);
+        EXPECT_EQ(x.coeffs(), poly3.coeffs());
+        EXPECT_EQ(y.coeffs(), poly4.coeffs());
+    }
+    {
+        auto poly1 = mpp::Poly<int>{1,1} * mpp::Poly<int>{1,2}; // (1+x)(1+2x)
+        auto poly2 = mpp::Poly<int>{1,1} * mpp::Poly<int>{2,3}; // (1+x)(2+3x)
+        auto poly3 = mpp::Poly<int>{-3};
+        auto poly4 = mpp::Poly<int>{2};
+        auto [y,x] = mpp::gcd_extended(poly1,poly2);
+        EXPECT_EQ(x.coeffs(), poly3.coeffs());
+        EXPECT_EQ(y.coeffs(), poly4.coeffs());
     }
 }
