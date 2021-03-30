@@ -2,6 +2,8 @@
 #ifndef __HH_MPP_MATHPP
 #define __HH_MPP_MATHPP
 
+#include "mathpp/logic.hh"
+
 #include <type_traits>
 #include <tuple>
 #include <cmath>
@@ -23,20 +25,6 @@ namespace mpp
     struct op_mul
         : public operation
     {};
-
-} // namespace mpp
-
-/* ************************************************************************** */
-// Logic Definitions
-/* ************************************************************************** */
-
-namespace mpp
-{
-
-    enum struct tristate
-    {
-        all, some, none
-    };
 
 } // namespace mpp
 
