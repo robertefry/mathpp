@@ -108,7 +108,6 @@ namespace mpp
     // division
 
     template <typename Tp, typename Tq>
-        requires std::is_convertible<Tq,Tp>::value
     struct division<Poly<Tp>,Poly<Tq>>
     {
         constexpr static tristate has()
@@ -412,6 +411,7 @@ namespace mpp
 {
 
     template <typename Tp, typename Tq>
+        requires std::totally_ordered_with<Tp,Tq>
     bool operator==(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
     {
         if (poly1.order() != poly2.order()) return false;
@@ -424,6 +424,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires std::totally_ordered_with<Tp,Tq>
     auto operator<=>(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
         -> std::compare_three_way_result_t<Tp,Tq>
     {
@@ -459,6 +460,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a + b; }
     auto operator+(Poly<Tp> const& poly)
     {
         std::vector<Tp> coeffs;
@@ -472,6 +474,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a - b; }
     auto operator-(Poly<Tp> const& poly)
     {
         std::vector<Tp> coeffs;
@@ -485,6 +488,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires requires (Tp a, Tq b) { a + b; }
     auto operator+(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
     {
         using Tr = op_add::result<Tp,Tq>::type;
@@ -508,6 +512,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a + b; }
     auto operator+(Poly<Tp> const& poly, Tp const& c)
     {
         std::vector<Tp> coeffs = poly.coeffs();
@@ -516,6 +521,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a + b; }
     auto operator+(Tp const& c, Poly<Tp> const& poly)
     {
         std::vector<Tp> coeffs = poly.coeffs();
@@ -524,6 +530,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires requires (Tp a, Tq b) { a - b; }
     auto operator-(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
     {
         using Tr = op_add::result<Tp,Tq>::type;
@@ -547,6 +554,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a - b; }
     auto operator-(Poly<Tp> const& poly, Tp const& c)
     {
         std::vector<Tp> coeffs = poly.coeffs();
@@ -555,6 +563,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a - b; }
     auto operator-(Tp const& c, Poly<Tp> const& poly)
     {
         std::vector<Tp> coeffs = poly.coeffs();
@@ -563,6 +572,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires requires (Tp a, Tq b) { a * b; }
     auto operator*(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
     {
         using Tr = op_add::result<Tp,Tq>::type;
@@ -583,6 +593,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a * b; }
     auto operator*(Poly<Tp> const& poly, Tp const& c)
     {
         std::vector<Tp> coeffs;
@@ -596,6 +607,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a * b; }
     auto operator*(Tp const& c, Poly<Tp> const& poly)
     {
         std::vector<Tp> coeffs;
@@ -609,6 +621,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a / b; }
     auto operator/(Poly<Tp> const& poly, Tp const& c)
     {
         std::vector<Tp> coeffs;
@@ -622,6 +635,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires (division<Poly<Tp>,Poly<Tq>>::has() != logic::none)
     auto operator%(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
     {
         using division = division<Poly<Tp>,Poly<Tq>>;
@@ -629,6 +643,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires (modulo<Tp,Tp>::has() != logic::none)
     auto operator%(Poly<Tp> const& poly, Tp const& c)
     {
         std::vector<Tp> coeffs;

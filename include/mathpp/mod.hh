@@ -412,6 +412,7 @@ namespace mpp
 {
 
     template <typename Tp, typename Tq>
+        requires std::totally_ordered_with<Tp,Tq>
     bool operator==(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
         auto const d = gcd<Tp>(mod1.modulus(),mod2.modulus());
@@ -420,19 +421,22 @@ namespace mpp
         return val1 == val2;
     }
 
-    template <typename Tp, typename Tq>
-    bool operator==(Mod<Tp> const& mod, Tq const& val)
+    template <typename Tp>
+        requires std::totally_ordered_with<Tp,Tp>
+    bool operator==(Mod<Tp> const& mod, Tp const& val)
     {
         return mod.value() == val;
     }
 
-    template <typename Tp, typename Tq>
-    bool operator==(Tq const& val, Mod<Tp> const& mod)
+    template <typename Tp>
+        requires std::totally_ordered_with<Tp,Tp>
+    bool operator==(Tp const& val, Mod<Tp> const& mod)
     {
         return val == mod.value();
     }
 
     template <typename Tp, typename Tq>
+        requires std::totally_ordered_with<Tp,Tq>
     auto operator<=>(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
         -> std::compare_three_way_result_t<Tp,Tq>
     {
@@ -442,16 +446,18 @@ namespace mpp
         return val1 <=> val2;
     }
 
-    template <typename Tp, typename Tq>
-    auto operator<=>(Mod<Tp> const& mod, Tq const& val)
-        -> std::compare_three_way_result_t<Tp,Tq>
+    template <typename Tp>
+        requires std::totally_ordered_with<Tp,Tp>
+    auto operator<=>(Mod<Tp> const& mod, Tp const& val)
+        -> std::compare_three_way_result_t<Tp,Tp>
     {
         return mod.value() <=> val;
     }
 
-    template <typename Tp, typename Tq>
-    auto operator<=>(Tq const& val, Mod<Tp> const& mod)
-        -> std::compare_three_way_result_t<Tp,Tq>
+    template <typename Tp>
+        requires std::totally_ordered_with<Tp,Tp>
+    auto operator<=>(Tp const& val, Mod<Tp> const& mod)
+        -> std::compare_three_way_result_t<Tp,Tp>
     {
         return val <=> mod.value();
     }
@@ -471,6 +477,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a + b; }
     auto operator+(Mod<Tp> const& mod)
     {
         auto value = identity<Tp,op_add>::get() + mod.value();
@@ -478,6 +485,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a - b; }
     auto operator-(Mod<Tp> const& mod)
     {
         auto value = identity<Tp,op_add>::get() - mod.value();
@@ -485,6 +493,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires requires (Tp a, Tq b) { a + b; }
     auto operator+(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
         using Tr = op_add::result<Tp,Tq>::type;
@@ -494,6 +503,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a + b; }
     auto operator+(Mod<Tp> const& mod, Tp const& c)
     {
         auto value = mod.value() + c;
@@ -501,6 +511,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a + b; }
     auto operator+(Tp const& c, Mod<Tp> const& mod)
     {
         auto value = c + mod.value();
@@ -508,6 +519,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires requires (Tp a, Tq b) { a - b; }
     auto operator-(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
         using Tr = op_add::result<Tp,Tq>::type;
@@ -517,6 +529,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a - b; }
     auto operator-(Mod<Tp> const& mod, Tp const& c)
     {
         auto value = mod.value() - c;
@@ -524,6 +537,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a - b; }
     auto operator-(Tp const& c, Mod<Tp> const& mod)
     {
         auto value = c - mod.value();
@@ -531,6 +545,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires requires (Tp a, Tq b) { a * b; }
     auto operator*(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
         using Tr = op_mul::result<Tp,Tq>::type;
@@ -540,6 +555,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a * b; }
     auto operator*(Mod<Tp> const& mod, Tp const& c)
     {
         auto value = mod.value() * c;
@@ -547,6 +563,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a * b; }
     auto operator*(Tp const& c, Mod<Tp> const& mod)
     {
         auto value = c * mod.value();
@@ -554,6 +571,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires requires (Tp a, Tq b) { a / b; }
     auto operator/(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
         using Tr = op_mul::result<Tp,Tq>::type;
@@ -563,6 +581,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a / b; }
     auto operator/(Mod<Tp> const& mod, Tp const& c)
     {
         auto value = mod.value() / c;
@@ -570,6 +589,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a / b; }
     auto operator/(Tp const& c, Mod<Tp> const& mod)
     {
         auto value = c / mod.value();
@@ -577,6 +597,7 @@ namespace mpp
     }
 
     template <typename Tp, typename Tq>
+        requires requires (Tp a, Tq b) { a % b; }
     auto operator%(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
         using Tr = op_mul::result<Tp,Tq>::type;
@@ -586,6 +607,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a % b; }
     auto operator%(Mod<Tp> const& mod, Tp const& c)
     {
         auto value = modulo<Tp,Tp>::get(mod.value(),c);
@@ -593,6 +615,7 @@ namespace mpp
     }
 
     template <typename Tp>
+        requires requires (Tp a, Tp b) { a % b; }
     auto operator%(Tp const& c, Mod<Tp> const& mod)
     {
         auto value = modulo<Tp,Tp>::get(c,mod.value());

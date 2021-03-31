@@ -22,9 +22,11 @@ namespace mpp
     struct op_add : public operation
     {
         template <typename Tp, typename Tq>
+            requires requires (Tp a, Tq b) { a + b; }
         static auto operate(Tp const& a, Tp const& b) { return a + b; }
 
         template <typename Tp, typename Tq>
+            requires requires (Tp a, Tq b) { a + b; }
         struct result {
             using type = std::result_of<decltype(operate<Tp,Tq>)&(Tp,Tq)>::type;
         };
@@ -33,9 +35,11 @@ namespace mpp
     struct op_mul : public operation
     {
         template <typename Tp, typename Tq>
+            requires requires (Tp a, Tq b) { a * b; }
         static auto operate(Tp const& a, Tp const& b) { return a * b; }
 
         template <typename Tp, typename Tq>
+            requires requires (Tp a, Tq b) { a * b; }
         struct result {
             using type = std::result_of<decltype(operate<Tp,Tq>)&(Tp,Tq)>::type;
         };
