@@ -26,58 +26,61 @@ namespace mpp
 // Implementation
 /* ************************************************************************** */
 
-template <typename Tp>
-Tp mpp::gcd(Tp const& a, Tp const& b)
+namespace mpp
 {
-    if (a < b) return gcd(b,a);
 
-    using mpp::op_add;  using mpp::op_mul;
-    Tp rn[] = {a,b};
-
-    while (rn[1] != mpp::identity<Tp,op_add>::get())
+    template <typename Tp>
+    Tp gcd(Tp const& a, Tp const& b)
     {
-        rn[0] %= rn[1];
-        std::swap(rn[0],rn[1]);
-    }
-    return mpp::absolute<Tp,op_add>::make(rn[0]);
-}
+        if (a < b) return gcd(b,a);
 
-template <typename Tp>
-std::tuple<Tp,Tp> mpp::gcd_extended(Tp const& a, Tp const& b)
-{
-    if (a < b)
-    {
-        std::tuple<Tp,Tp> result = gcd_extended(b,a);
-        std::swap(std::get<0>(result),std::get<1>(result));
-        return result;
+        Tp rn[] = {a,b};
+
+        while (rn[1] != identity<Tp,op_add>::get())
+        {
+            rn[0] %= rn[1];
+            std::swap(rn[0],rn[1]);
+        }
+        return absolute<Tp,op_add>::make(rn[0]);
     }
 
-    using mpp::op_add;  using mpp::op_mul;
-    std::tuple<Tp,Tp> sn[] = {
-        { mpp::identity<Tp,op_mul>::get(), mpp::identity<Tp,op_add>::get() },
-        { mpp::identity<Tp,op_add>::get(), mpp::identity<Tp,op_mul>::get() },
-    };
-    Tp rn[] = {a,b};
-
-    while (rn[1] != mpp::identity<Tp,op_add>::get())
+    template <typename Tp>
+    std::tuple<Tp,Tp> gcd_extended(Tp const& a, Tp const& b)
     {
-        Tp const qm = rn[0] / rn[1];
-        sn[0] = {
-            std::get<0>(sn[0]) - std::get<0>(sn[1]) * qm,
-            std::get<1>(sn[0]) - std::get<1>(sn[1]) * qm,
+        if (a < b)
+        {
+            std::tuple<Tp,Tp> result = gcd_extended(b,a);
+            std::swap(std::get<0>(result),std::get<1>(result));
+            return result;
+        }
+
+        std::tuple<Tp,Tp> sn[] = {
+            { identity<Tp,op_mul>::get(), identity<Tp,op_add>::get() },
+            { identity<Tp,op_add>::get(), identity<Tp,op_mul>::get() },
         };
-        std::swap(sn[0],sn[1]);
+        Tp rn[] = {a,b};
 
-        rn[0] %= rn[1];
-        std::swap(rn[0],rn[1]);
+        while (rn[1] != identity<Tp,op_add>::get())
+        {
+            Tp const qm = rn[0] / rn[1];
+            sn[0] = {
+                std::get<0>(sn[0]) - std::get<0>(sn[1]) * qm,
+                std::get<1>(sn[0]) - std::get<1>(sn[1]) * qm,
+            };
+            std::swap(sn[0],sn[1]);
+
+            rn[0] %= rn[1];
+            std::swap(rn[0],rn[1]);
+        }
+        if (rn[0] < identity<Tp,op_add>::get())
+        {
+            inverse<Tp,op_add>::make(std::get<0>(sn[0]));
+            inverse<Tp,op_add>::make(std::get<1>(sn[0]));
+            std::swap(std::get<0>(sn[0]),std::get<1>(sn[0]));
+        }
+        return sn[0];
     }
-    if (rn[0] < mpp::identity<Tp,op_add>::get())
-    {
-        mpp::inverse<Tp,op_add>::make(std::get<0>(sn[0]));
-        mpp::inverse<Tp,op_add>::make(std::get<1>(sn[0]));
-        std::swap(std::get<0>(sn[0]),std::get<1>(sn[0]));
-    }
-    return sn[0];
-}
+
+} // namespace mpp
 
 #endif /* __HH_MPP_GCD */
