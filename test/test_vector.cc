@@ -253,3 +253,13 @@ TEST(MPP_VECTOR, MATH_EXTRA)
         EXPECT_EQ(vec.elements(), elems);
     }
 }
+
+TEST(MPP_VECTOR, COVECTOR)
+{
+    auto const vec = Vector<int,3>{1,2,3};
+    {
+        auto const covec = CoVector<int,3>{1,2,3};
+        auto scalar = covec * vec;
+        EXPECT_EQ(scalar, 14);
+    }
+}

@@ -13,33 +13,33 @@
 namespace mpp
 {
 
-    template <typename Tp, size_t Nm>
-    class Vector
+    template <typename Tp, size_t Nm, bool Vh>
+    class VectorBase
     {
     public:
-        explicit Vector();
-        explicit Vector(Tp const&);
-        virtual ~Vector() = default;
+        explicit VectorBase();
+        explicit VectorBase(Tp const&);
+        virtual ~VectorBase() = default;
 
         template <typename... Args>
             requires (std::conjunction<std::is_convertible<Args,Tp>...>::value)
-        Vector(Args const&... args)
+        VectorBase(Args const&... args)
             requires (sizeof...(args) == Nm);
 
         template <typename... Args>
             requires (std::conjunction<std::is_same<Args,Tp>...>::value)
-        Vector(Args&&... args)
+        VectorBase(Args&&... args)
             requires (sizeof...(args) == Nm);
 
         template <typename Tq>
             requires (std::is_convertible<Tq,Tp>::value)
-        Vector(Vector<Tq,Nm> const&);
+        VectorBase(VectorBase<Tq,Nm,Vh> const&);
 
         template <typename Tq>
             requires (std::is_assignable<Tq,Tp>::value)
-        Vector<Tp,Nm>& operator=(Vector<Tq,Nm> const&);
+        VectorBase<Tp,Nm,Vh>& operator=(VectorBase<Tq,Nm,Vh> const&);
 
-        void swap(Vector<Tp,Nm>&);
+        void swap(VectorBase<Tp,Nm,Vh>&);
 
     public:
         constexpr static auto size() { return Nm; }
@@ -58,19 +58,25 @@ namespace mpp
         auto at(size_t i) -> Tp& { return m_Elements.at(i); }
 
         template <typename Tq>
-        Vector<Tp,Nm>& operator+=(Vector<Tq,Nm> const&);
+        VectorBase<Tp,Nm,Vh>& operator+=(VectorBase<Tq,Nm,Vh> const&);
         template <typename Tq>
-        Vector<Tp,Nm>& operator-=(Vector<Tq,Nm> const&);
+        VectorBase<Tp,Nm,Vh>& operator-=(VectorBase<Tq,Nm,Vh> const&);
         template <typename Tq>
-        Vector<Tp,Nm>& operator*=(Tq const&);
+        VectorBase<Tp,Nm,Vh>& operator*=(Tq const&);
         template <typename Tq>
-        Vector<Tp,Nm>& operator/=(Tq const&);
+        VectorBase<Tp,Nm,Vh>& operator/=(Tq const&);
         template <typename Tq>
-        Vector<Tp,Nm>& operator%=(Tq const&);
+        VectorBase<Tp,Nm,Vh>& operator%=(Tq const&);
 
     private:
         std::vector<Tp> m_Elements{};
     };
+
+    template <typename Tp, size_t Nm>
+    using Vector = VectorBase<Tp,Nm,true>;
+
+    template <typename Tp, size_t Nm>
+    using CoVector = VectorBase<Tp,Nm,false>;
 
 } // namespace mpp
 
@@ -83,19 +89,19 @@ namespace mpp
 
     // identity
 
-    template <typename Tp, size_t Nm>
-    struct identity<Vector<Tp,Nm>,op_add>
+    template <typename Tp, size_t Nm, bool Vh>
+    struct identity<VectorBase<Tp,Nm,Vh>,op_add>
     {
         constexpr static tristate has()
         {
             return identity<Tp,op_add>::has();
         }
-        static Vector<Tp,Nm> const& get()
+        static VectorBase<Tp,Nm,Vh> const& get()
         {
-            static auto const s_ident = Vector<Tp,Nm>{identity<Tp,op_add>::get()};
+            static auto const s_ident = VectorBase<Tp,Nm,Vh>{identity<Tp,op_add>::get()};
             return s_ident;
         }
-        static Vector<Tp,Nm>& make(Vector<Tp,Nm>& vec)
+        static VectorBase<Tp,Nm,Vh>& make(VectorBase<Tp,Nm,Vh>& vec)
         {
             return vec = get();
         }
@@ -110,40 +116,40 @@ namespace mpp
 namespace mpp
 {
 
-    template <typename Tp, size_t Nm>
-    Vector<Tp,Nm>::Vector()
+    template <typename Tp, size_t Nm, bool Vh>
+    VectorBase<Tp,Nm,Vh>::VectorBase()
         : m_Elements(Nm,identity<Tp,op_add>::get())
     {
     }
 
-    template <typename Tp, size_t Nm>
-    Vector<Tp,Nm>::Vector(Tp const& value)
+    template <typename Tp, size_t Nm, bool Vh>
+    VectorBase<Tp,Nm,Vh>::VectorBase(Tp const& value)
         : m_Elements(Nm,value)
     {
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename... Args>
         requires (std::conjunction<std::is_convertible<Args,Tp>...>::value)
-    Vector<Tp,Nm>::Vector(Args const&... args)
+    VectorBase<Tp,Nm,Vh>::VectorBase(Args const&... args)
         requires (sizeof...(args) == Nm)
         : m_Elements{static_cast<Tp>(args)...}
     {
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename... Args>
         requires (std::conjunction<std::is_same<Args,Tp>...>::value)
-    Vector<Tp,Nm>::Vector(Args&&... args)
+    VectorBase<Tp,Nm,Vh>::VectorBase(Args&&... args)
         requires (sizeof...(args) == Nm)
         : m_Elements{std::forward<Args>(args)...}
     {
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename Tq>
         requires (std::is_convertible<Tq,Tp>::value)
-    Vector<Tp,Nm>::Vector(Vector<Tq,Nm> const& other)
+    VectorBase<Tp,Nm,Vh>::VectorBase(VectorBase<Tq,Nm,Vh> const& other)
     {
         m_Elements.reserve(Nm);
 
@@ -153,10 +159,10 @@ namespace mpp
         }
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename Tq>
         requires (std::is_assignable<Tq,Tp>::value)
-    Vector<Tp,Nm>& Vector<Tp,Nm>::operator=(Vector<Tq,Nm> const& other)
+    VectorBase<Tp,Nm,Vh>& VectorBase<Tp,Nm,Vh>::operator=(VectorBase<Tq,Nm,Vh> const& other)
     {
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -164,14 +170,14 @@ namespace mpp
         }
     }
 
-    template <typename Tp, size_t Nm>
-    void Vector<Tp,Nm>::swap(Vector<Tp,Nm>& other)
+    template <typename Tp, size_t Nm, bool Vh>
+    void VectorBase<Tp,Nm,Vh>::swap(VectorBase<Tp,Nm,Vh>& other)
     {
         std::swap(m_Elements,other.m_Elements);
     }
 
-    template <typename Tp, size_t Nm>
-    void Vector<Tp,Nm>::assign(Tp const& value)
+    template <typename Tp, size_t Nm, bool Vh>
+    void VectorBase<Tp,Nm,Vh>::assign(Tp const& value)
     {
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -179,18 +185,18 @@ namespace mpp
         }
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename... Args>
         requires (std::conjunction<std::is_assignable<Args,Tp>...>::value)
-    void Vector<Tp,Nm>::assign(Args&&... args)
+    void VectorBase<Tp,Nm,Vh>::assign(Args&&... args)
         requires (sizeof...(args) == Nm)
     {
         m_Elements = {std::forward<Args>(args)...};
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename Tq>
-    Vector<Tp,Nm>& Vector<Tp,Nm>::operator+=(Vector<Tq,Nm> const& other)
+    VectorBase<Tp,Nm,Vh>& VectorBase<Tp,Nm,Vh>::operator+=(VectorBase<Tq,Nm,Vh> const& other)
     {
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -199,9 +205,9 @@ namespace mpp
         return *this;
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename Tq>
-    Vector<Tp,Nm>& Vector<Tp,Nm>::operator-=(Vector<Tq,Nm> const& other)
+    VectorBase<Tp,Nm,Vh>& VectorBase<Tp,Nm,Vh>::operator-=(VectorBase<Tq,Nm,Vh> const& other)
     {
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -210,9 +216,9 @@ namespace mpp
         return *this;
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename Tq>
-    Vector<Tp,Nm>& Vector<Tp,Nm>::operator*=(Tq const& scalar)
+    VectorBase<Tp,Nm,Vh>& VectorBase<Tp,Nm,Vh>::operator*=(Tq const& scalar)
     {
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -221,9 +227,9 @@ namespace mpp
         return *this;
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename Tq>
-    Vector<Tp,Nm>& Vector<Tp,Nm>::operator/=(Tq const& scalar)
+    VectorBase<Tp,Nm,Vh>& VectorBase<Tp,Nm,Vh>::operator/=(Tq const& scalar)
     {
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -232,9 +238,9 @@ namespace mpp
         return *this;
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename Tq>
-    Vector<Tp,Nm>& Vector<Tp,Nm>::operator%=(Tq const& scalar)
+    VectorBase<Tp,Nm,Vh>& VectorBase<Tp,Nm,Vh>::operator%=(Tq const& scalar)
     {
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -252,9 +258,9 @@ namespace mpp
 namespace mpp
 {
 
-    template <typename Tp, typename Tq, size_t Nm>
+    template <typename Tp, typename Tq, size_t Nm, bool Vh>
         requires requires (Tp a, Tq b) { a != b; }
-    bool operator==(Vector<Tp,Nm> const& vec1, Vector<Tq,Nm> const& vec2)
+    bool operator==(VectorBase<Tp,Nm,Vh> const& vec1, VectorBase<Tq,Nm,Vh> const& vec2)
     {
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -263,11 +269,11 @@ namespace mpp
         return true;
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
         requires requires (Tp a, Tp b) { a + b; }
-    auto operator+(Vector<Tp,Nm> const& vec)
+    auto operator+(VectorBase<Tp,Nm,Vh> const& vec)
     {
-        auto result = Vector<Tp,Nm>{identity<Tp,op_add>::get()};
+        auto result = VectorBase<Tp,Nm,Vh>{identity<Tp,op_add>::get()};
 
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -276,11 +282,11 @@ namespace mpp
         return result;
     }
 
-    template <typename Tp, size_t Nm>
+    template <typename Tp, size_t Nm, bool Vh>
         requires requires (Tp a, Tp b) { a - b; }
-    auto operator-(Vector<Tp,Nm> const& vec)
+    auto operator-(VectorBase<Tp,Nm,Vh> const& vec)
     {
-        auto result = Vector<Tp,Nm>{identity<Tp,op_add>::get()};
+        auto result = VectorBase<Tp,Nm,Vh>{identity<Tp,op_add>::get()};
 
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -289,11 +295,11 @@ namespace mpp
         return result;
     }
 
-    template <typename Tp, typename Tq, size_t Nm>
+    template <typename Tp, typename Tq, size_t Nm, bool Vh>
         requires requires (Tp a, Tq b) { a + b; }
-    auto operator+(Vector<Tp,Nm> const& vec1, Vector<Tq,Nm> const& vec2)
+    auto operator+(VectorBase<Tp,Nm,Vh> const& vec1, VectorBase<Tq,Nm,Vh> const& vec2)
     {
-        auto result = Vector<Tp,Nm>{vec1};
+        auto result = VectorBase<Tp,Nm,Vh>{vec1};
 
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -302,11 +308,11 @@ namespace mpp
         return result;
     }
 
-    template <typename Tp, typename Tq, size_t Nm>
+    template <typename Tp, typename Tq, size_t Nm, bool Vh>
         requires requires (Tp a, Tq b) { a - b; }
-    auto operator-(Vector<Tp,Nm> const& vec1, Vector<Tq,Nm> const& vec2)
+    auto operator-(VectorBase<Tp,Nm,Vh> const& vec1, VectorBase<Tq,Nm,Vh> const& vec2)
     {
-        auto result = Vector<Tp,Nm>{vec1};
+        auto result = VectorBase<Tp,Nm,Vh>{vec1};
 
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -315,11 +321,11 @@ namespace mpp
         return result;
     }
 
-    template <typename Tp, typename Tq, size_t Nm>
+    template <typename Tp, typename Tq, size_t Nm, bool Vh>
         requires requires (Tp a, Tq b) { a * b; }
-    auto operator*(Vector<Tp,Nm> const& vec, Tq const& scalar)
+    auto operator*(VectorBase<Tp,Nm,Vh> const& vec, Tq const& scalar)
     {
-        auto result = Vector<Tp,Nm>{vec};
+        auto result = VectorBase<Tp,Nm,Vh>{vec};
 
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -328,11 +334,11 @@ namespace mpp
         return result;
     }
 
-    template <typename Tp, typename Tq, size_t Nm>
+    template <typename Tp, typename Tq, size_t Nm, bool Vh>
         requires requires (Tp a, Tq b) { b * a; }
-    auto operator*(Tq const& scalar, Vector<Tp,Nm> const& vec)
+    auto operator*(Tq const& scalar, VectorBase<Tp,Nm,Vh> const& vec)
     {
-        auto result = Vector<Tp,Nm>{vec};
+        auto result = VectorBase<Tp,Nm,Vh>{vec};
 
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -341,11 +347,11 @@ namespace mpp
         return result;
     }
 
-    template <typename Tp, typename Tq, size_t Nm>
+    template <typename Tp, typename Tq, size_t Nm, bool Vh>
         requires requires (Tp a, Tq b) { a / b; }
-    auto operator/(Vector<Tp,Nm> const& vec, Tq const& scalar)
+    auto operator/(VectorBase<Tp,Nm,Vh> const& vec, Tq const& scalar)
     {
-        auto result = Vector<Tp,Nm>{vec};
+        auto result = VectorBase<Tp,Nm,Vh>{vec};
 
         for (size_t i = 0; i < Nm; ++i)
         {
@@ -354,15 +360,29 @@ namespace mpp
         return result;
     }
 
-    template <typename Tp, typename Tq, size_t Nm>
+    template <typename Tp, typename Tq, size_t Nm, bool Vh>
         requires (modulo<Tp,Tq>::has() != logic::none)
-    auto operator%(Vector<Tp,Nm> const& vec, Tq const& scalar)
+    auto operator%(VectorBase<Tp,Nm,Vh> const& vec, Tq const& scalar)
     {
-        auto result = Vector<Tp,Nm>{vec};
+        auto result = VectorBase<Tp,Nm,Vh>{vec};
 
         for (size_t i = 0; i < Nm; ++i)
         {
             modulo<Tp,Tq>::make(result[i],scalar);
+        }
+        return result;
+    }
+
+    template <typename Tp, typename Tq, size_t Nm>
+        requires requires (Tp a, Tq b) { a + b; a * b; }
+            && (identity<typename op_mul::result<Tp,Tq>::type,op_add>::has() != logic::none)
+    auto operator*(CoVector<Tp,Nm> const& covec, Vector<Tq,Nm> const& vec)
+    {
+        auto result = identity<typename op_mul::result<Tp,Tq>::type,op_add>::get();
+
+        for (size_t i = 0; i < Nm; ++i)
+        {
+            result += covec[i] * vec[i];
         }
         return result;
     }
@@ -376,8 +396,8 @@ namespace mpp
 namespace std
 {
 
-    template <typename Tp, size_t Nm>
-    void swap(mpp::Vector<Tp,Nm> const& vec1, mpp::Vector<Tp,Nm> const& vec2)
+    template <typename Tp, size_t Nm, bool Vh>
+    void swap(mpp::VectorBase<Tp,Nm,Vh> const& vec1, mpp::VectorBase<Tp,Nm,Vh> const& vec2)
     {
         vec1.swap(vec2);
     }
