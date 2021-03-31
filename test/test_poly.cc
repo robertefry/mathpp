@@ -104,7 +104,7 @@ TEST(MPP_POLY, MATHPP)
 {
     using mpp::op_add;  using mpp::op_mul;
     {
-        using identity = mpp::identity<mpp::Poly<int>,mpp::op_add>;
+        using identity = mpp::identity<mpp::Poly<int>,op_add>;
         auto has = identity::has();
         EXPECT_TRUE(has == mpp::logic::all);
 
@@ -118,7 +118,7 @@ TEST(MPP_POLY, MATHPP)
         EXPECT_TRUE(poly2 == poly);
     }
     {
-        using identity = mpp::identity<mpp::Poly<int>,mpp::op_mul>;
+        using identity = mpp::identity<mpp::Poly<int>,op_mul>;
         auto has = identity::has();
         EXPECT_TRUE(has == mpp::logic::all);
 
@@ -132,7 +132,7 @@ TEST(MPP_POLY, MATHPP)
         EXPECT_TRUE(poly2 == poly);
     }
     {
-        using inverse = mpp::inverse<mpp::Poly<int>,mpp::op_add>;
+        using inverse = mpp::inverse<mpp::Poly<int>,op_add>;
         auto has = inverse::has();
         EXPECT_TRUE(has == mpp::logic::all);
 
@@ -150,7 +150,7 @@ TEST(MPP_POLY, MATHPP)
     }
     {
         // Polynomials do not have multiplicative inverses
-        using inverse = mpp::inverse<mpp::Poly<int>,mpp::op_mul>;
+        using inverse = mpp::inverse<mpp::Poly<int>,op_mul>;
         auto has = inverse::has();
         EXPECT_TRUE(has == mpp::logic::none);
     }
@@ -173,7 +173,7 @@ TEST(MPP_POLY, MATHPP)
     }
     {
         // Polynomials do not have multiplicative absolutes
-        using absolute = mpp::absolute<mpp::Poly<int>,mpp::op_mul>;
+        using absolute = mpp::absolute<mpp::Poly<int>,op_mul>;
         auto has = absolute::has();
         EXPECT_TRUE(has == mpp::logic::none);
     }
