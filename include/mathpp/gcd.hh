@@ -38,7 +38,7 @@ namespace mpp
 
         while (rn[1] != identity<Tp,op_add>::get())
         {
-            rn[0] %= rn[1];
+            modulo<Tp,Tp>::make(rn[0],rn[1]);
             std::swap(rn[0],rn[1]);
         }
         return absolute<Tp,op_add>::make(rn[0]);
@@ -69,7 +69,7 @@ namespace mpp
             };
             std::swap(sn[0],sn[1]);
 
-            rn[0] %= rn[1];
+            modulo<Tp,Tp>::make(rn[0],rn[1]);
             std::swap(rn[0],rn[1]);
         }
         if (rn[0] < identity<Tp,op_add>::get())
