@@ -2,14 +2,14 @@
 #include "gtest/gtest.h"
 #include <mathpp/mathpp.hh>
 
-#include <limits>
+#include <cstdint>
 
 using mpp::op_add;  using mpp::op_mul;
 
 TEST(MATHPP, PRIMITIVE_IDENTITY)
 {
     {
-        using Tp = unsigned;
+        using Tp = uint32_t;
         using identity = mpp::identity<Tp,op_add>;
 
         auto has = identity::has();
@@ -19,7 +19,7 @@ TEST(MATHPP, PRIMITIVE_IDENTITY)
         EXPECT_EQ(ident,0);
     }
     {
-        using Tp = signed;
+        using Tp = int32_t;
         using identity = mpp::identity<Tp,op_add>;
 
         auto has = identity::has();
@@ -39,7 +39,7 @@ TEST(MATHPP, PRIMITIVE_IDENTITY)
         EXPECT_EQ(ident,0);
     }
     {
-        using Tp = unsigned;
+        using Tp = uint32_t;
         using identity = mpp::identity<Tp,op_mul>;
 
         auto has = identity::has();
@@ -49,7 +49,7 @@ TEST(MATHPP, PRIMITIVE_IDENTITY)
         EXPECT_EQ(ident,1);
     }
     {
-        using Tp = signed;
+        using Tp = int32_t;
         using identity = mpp::identity<Tp,op_mul>;
 
         auto has = identity::has();
@@ -74,14 +74,14 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
 {
     {
         // The unsigned integers do not have additive inverses
-        using Tp = unsigned;
+        using Tp = uint32_t;
         using inverse = mpp::inverse<Tp,op_add>;
 
         auto has = inverse::has();
         EXPECT_TRUE(has == mpp::logic::none);
     }
     {
-        using Tp = signed;
+        using Tp = int32_t;
         using inverse = mpp::inverse<Tp,op_add>;
         Tp value = -10;
 
@@ -116,7 +116,7 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
     }
     {
         // The unsigned integers do not have multiplicative inverses
-        using Tp = unsigned;
+        using Tp = uint32_t;
         using inverse = mpp::inverse<Tp,op_mul>;
 
         auto has = inverse::has();
@@ -124,7 +124,7 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
     }
     {
         // The signed integers do not have multiplicative inverses
-        using Tp = signed;
+        using Tp = int32_t;
         using inverse = mpp::inverse<Tp,op_mul>;
 
         auto has = inverse::has();
@@ -153,9 +153,9 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
 {
     {
         // The unsigned integers are their own additive absolutes
-        using Tp = unsigned;
+        using Tp = uint32_t;
         using absolute = mpp::absolute<Tp,op_add>;
-        Tp value = -10;
+        Tp value = 0xFFFFFFF5; // -10
 
         auto has = absolute::has();
         EXPECT_TRUE(has == mpp::logic::all);
@@ -164,13 +164,13 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         EXPECT_TRUE(can);
 
         auto value1 = absolute::get(value);
-        EXPECT_EQ(value1,std::numeric_limits<Tp>::max()-10+1);
+        EXPECT_EQ(value1,0xFFFFFFF5);
 
         absolute::make(value);
-        EXPECT_EQ(value,std::numeric_limits<Tp>::max()-10+1);
+        EXPECT_EQ(value,0xFFFFFFF5);
     }
     {
-        using Tp = signed;
+        using Tp = int32_t;
         using absolute = mpp::absolute<Tp,op_add>;
         Tp value = -10;
 
@@ -204,20 +204,40 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         EXPECT_EQ(value,10);
     }
     {
-        /* The unsigned integers do not have multiplicative inverses */
-        using Tp = unsigned;
+        // The unsigned integers are their own multiplicative absolutes
+        using Tp = uint32_t;
         using absolute = mpp::absolute<Tp,op_mul>;
+        Tp value = 0xFFFFFFF5; // -10
 
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::logic::none);
+        EXPECT_TRUE(has == mpp::logic::all);
+
+        auto can = absolute::can(Tp{});
+        EXPECT_TRUE(can);
+
+        auto value1 = absolute::get(value);
+        EXPECT_EQ(value1,0xFFFFFFF5);
+
+        absolute::make(value);
+        EXPECT_EQ(value,0xFFFFFFF5);
     }
     {
-        /* The signed integers do not have multiplicative inverses */
-        using Tp = signed;
+        // The signed integers are their own multiplicative absolutes
+        using Tp = uint32_t;
         using absolute = mpp::absolute<Tp,op_mul>;
+        Tp value = -10;
 
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::logic::none);
+        EXPECT_TRUE(has == mpp::logic::all);
+
+        auto can = absolute::can(Tp{});
+        EXPECT_TRUE(can);
+
+        auto value1 = absolute::get(value);
+        EXPECT_EQ(value1,-10);
+
+        absolute::make(value);
+        EXPECT_EQ(value,-10);
     }
     {
         using Tp = float;
@@ -241,7 +261,7 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
 TEST(MATHPP, PRIMITIVE_MODULO)
 {
     {
-        using Tp = unsigned;
+        using Tp = uint32_t;
         using modulo = mpp::modulo<Tp,Tp>;
         Tp value = 10, mod = 7;
 
@@ -255,7 +275,7 @@ TEST(MATHPP, PRIMITIVE_MODULO)
         EXPECT_EQ(value,3);
     }
     {
-        using Tp = signed;
+        using Tp = int32_t;
         using modulo = mpp::modulo<Tp,Tp>;
         Tp value = 10, mod = 7;
 
@@ -269,7 +289,7 @@ TEST(MATHPP, PRIMITIVE_MODULO)
         EXPECT_EQ(value,3);
     }
     {
-        using Tp = signed;
+        using Tp = int32_t;
         using modulo = mpp::modulo<Tp,Tp>;
         Tp value = -10, mod = 7;
 

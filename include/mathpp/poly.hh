@@ -134,32 +134,6 @@ namespace mpp
         }
     };
 
-    // absolute
-
-    template <typename Tp>
-    struct absolute<Poly<Tp>,op_add>
-    {
-        constexpr static tristate has()
-        {
-            return logic::all;
-        }
-        constexpr static bool can(Poly<Tp> const&)
-        {
-            return true;
-        }
-        static Poly<Tp> get(Poly<Tp> const& e)
-        {
-            auto const negative = e.coeffs().back() < identity<Tp,op_add>::get();
-            return negative ? -e : e;
-        }
-        static Poly<Tp>& make(Poly<Tp>& e)
-        {
-            auto const negative = e.coeffs().back() < identity<Tp,op_add>::get();
-            if (negative) e *= inverse<Tp,op_add>::get(identity<Tp,op_mul>::get());
-            return e;
-        }
-    };
-
     // modulo
 
     template <typename Tp, typename Tq>

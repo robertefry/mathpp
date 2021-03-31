@@ -155,46 +155,24 @@ namespace mpp
         }
     };
 
-    template <typename Tp>
-    struct absolute<Mod<Tp>,op_add>
+    template <typename Tp, typename Op>
+    struct absolute<Mod<Tp>,Op>
     {
         constexpr static tristate has()
         {
-            return absolute<Tp,op_add>::has();
+            return absolute<Tp,Op>::has();
         }
         constexpr static bool can(Mod<Tp> const& e)
         {
-            return absolute<Tp,op_add>::can(e.value());
+            return absolute<Tp,Op>::can(e.value());
         }
         static Mod<Tp> get(Mod<Tp> const& e)
         {
-            return e;
+            return Mod<Tp>{e.modulus(),absolute<Tp,Op>::get(e.value())};
         }
         static Mod<Tp>& make(Mod<Tp>& e)
         {
-            return e;
-        }
-    };
-
-    template <typename Tp>
-    struct absolute<Mod<Tp>,op_mul>
-    {
-        constexpr static tristate has()
-        {
-            return absolute<Tp,op_mul>::has();
-        }
-        constexpr static bool can(Mod<Tp> const& e)
-        {
-            return absolute<Tp,op_mul>::can(e.value());
-        }
-        static Mod<Tp> get(Mod<Tp> e)
-        {
-            auto copy = e;
-            return make(copy);
-        }
-        static Mod<Tp>& make(Mod<Tp>& e)
-        {
-            return e = absolute<Tp,op_mul>::get(e.value());
+            return e = absolute<Tp,Op>::get(e.value());
         }
     };
 

@@ -172,10 +172,22 @@ TEST(MPP_POLY, MATHPP)
         EXPECT_TRUE(poly1 == poly);
     }
     {
-        // Polynomials do not have multiplicative absolutes
+        // Polynomials are their own multiplicative absolutes
         using absolute = mpp::absolute<mpp::Poly<int>,op_mul>;
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::logic::none);
+        EXPECT_TRUE(has == mpp::logic::all);
+
+        auto const poly = mpp::Poly<int>{1,2,3};
+
+        auto poly1 = mpp::Poly<int>{1,2,3};
+        auto can = absolute::can(poly1);
+        EXPECT_TRUE(can);
+
+        auto poly2 = absolute::get(poly1);
+        EXPECT_TRUE(poly2 == poly);
+
+        absolute::make(poly1);
+        EXPECT_TRUE(poly1 == poly);
     }
     {
         using modulo = mpp::modulo<mpp::Poly<int>,mpp::Poly<int>>;
