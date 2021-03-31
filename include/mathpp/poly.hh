@@ -198,21 +198,11 @@ namespace mpp
         }
         static Poly<Tp> get(Poly<Tp> const& e, Poly<Tq> const& n)
         {
-            auto copy = e;
-            return make(copy,n);
+            return std::get<0>(division<Poly<Tp>,Poly<Tq>>::get(e,n));
         }
         static Poly<Tp>& make(Poly<Tp>& e, Poly<Tq> const& n)
         {
-            auto const c_coeffs = std::vector<Tq>{n.coeffs().begin(),n.coeffs().end()-1};
-            auto const c_poly = -Poly<Tq>{std::move(c_coeffs)};
-
-            while (e.order() >= n.order())
-            {
-                auto const coeff = e.coeffs().back();
-                e -= Poly<Tp>{coeff} <<= e.order();
-                e += (coeff * c_poly) <<= (e.order() - n.order() + 1);
-            }
-            return e;
+            return e = get(e,n);
         }
     };
 
