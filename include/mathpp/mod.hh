@@ -110,27 +110,6 @@ namespace mpp
     };
 
     template <typename Tp>
-    struct inverse<Mod<Tp>,op_add>
-    {
-        constexpr static tristate has()
-        {
-            return logic::all;
-        }
-        constexpr static bool can(Mod<Tp> const&)
-        {
-            return true;
-        }
-        static Mod<Tp> get(Mod<Tp> const& e)
-        {
-            return -e;
-        }
-        static Mod<Tp>& make(Mod<Tp>& e)
-        {
-            return e *= inverse<Tp,op_add>::get(identity<Tp,op_mul>::get());
-        }
-    };
-
-    template <typename Tp>
     struct inverse<Mod<Tp>,op_mul>
     {
         constexpr static tristate has()

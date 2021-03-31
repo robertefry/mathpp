@@ -105,33 +105,6 @@ namespace mpp
         }
     };
 
-    // inverse
-
-    template <typename Tp>
-    struct inverse<Poly<Tp>,op_add>
-    {
-        constexpr static tristate has()
-        {
-            return inverse<Tp,op_add>::has();
-        }
-        constexpr static bool can(Poly<Tp> const& e)
-        {
-            for (auto const& coeff : e.coeffs())
-            {
-                if (inverse<Tp,op_add>::can(coeff) == false) return false;
-            }
-            return true;
-        }
-        static Poly<Tp> get(Poly<Tp> const& e)
-        {
-            return -e;
-        }
-        static Poly<Tp>& make(Poly<Tp>& e)
-        {
-            return e *= inverse<Tp,op_add>::get(identity<Tp,op_mul>::get());
-        }
-    };
-
     // division
 
     template <typename Tp, typename Tq>
