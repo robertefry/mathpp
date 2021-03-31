@@ -564,9 +564,8 @@ namespace mpp
     template <typename Tp, typename Tq>
     auto operator+(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
+        using Tr = op_add::result<Tp,Tq>::type;
         auto value = mod1.value() + mod2.value();
-
-        using Tr = decltype(value);
         auto const d = gcd<Tr>(mod1.modulus(),mod2.modulus());
         return Mod<Tr>{d,std::move(value)};
     }
@@ -588,9 +587,8 @@ namespace mpp
     template <typename Tp, typename Tq>
     auto operator-(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
+        using Tr = op_add::result<Tp,Tq>::type;
         auto value = mod1.value() - mod2.value();
-
-        using Tr = decltype(value);
         auto const d = gcd<Tr>(mod1.modulus(),mod2.modulus());
         return Mod<Tr>{d,std::move(value)};
     }
@@ -612,9 +610,8 @@ namespace mpp
     template <typename Tp, typename Tq>
     auto operator*(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
+        using Tr = op_mul::result<Tp,Tq>::type;
         auto value = mod1.value() * mod2.value();
-
-        using Tr = decltype(value);
         auto const d = gcd<Tr>(mod1.modulus(),mod2.modulus());
         return Mod<Tr>{d,std::move(value)};
     }
@@ -636,9 +633,8 @@ namespace mpp
     template <typename Tp, typename Tq>
     auto operator/(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
+        using Tr = op_mul::result<Tp,Tq>::type;
         auto value = mod1.value() / mod2.value();
-
-        using Tr = decltype(value);
         auto const d = gcd<Tr>(mod1.modulus(),mod2.modulus());
         return Mod<Tr>{d,std::move(value)};
     }
@@ -660,9 +656,8 @@ namespace mpp
     template <typename Tp, typename Tq>
     auto operator%(Mod<Tp> const& mod1, Mod<Tq> const& mod2)
     {
+        using Tr = op_mul::result<Tp,Tq>::type;
         auto value = mod1.value() % mod2.value();
-
-        using Tr = decltype(value);
         auto const d = gcd<Tr>(mod1.modulus(),mod2.modulus());
         return Mod<Tr>{d,std::move(value)};
     }

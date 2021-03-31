@@ -18,13 +18,27 @@ namespace mpp
     struct operation
     {};
 
-    struct op_add
-        : public operation
-    {};
+    struct op_add : public operation
+    {
+        template <typename Tp, typename Tq>
+        static auto operate(Tp const& a, Tp const& b) { return a + b; }
 
-    struct op_mul
-        : public operation
-    {};
+        template <typename Tp, typename Tq>
+        struct result {
+            using type = std::result_of<decltype(operate<Tp,Tq>)&(Tp,Tq)>::type;
+        };
+    };
+
+    struct op_mul : public operation
+    {
+        template <typename Tp, typename Tq>
+        static auto operate(Tp const& a, Tp const& b) { return a * b; }
+
+        template <typename Tp, typename Tq>
+        struct result {
+            using type = std::result_of<decltype(operate<Tp,Tq>)&(Tp,Tq)>::type;
+        };
+    };
 
 } // namespace mpp
 

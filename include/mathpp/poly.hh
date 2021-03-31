@@ -254,7 +254,7 @@ namespace mpp
         }
         static auto get(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
         {
-            using Tr = decltype(poly1[0]/poly2[0]);
+            using Tr = op_mul::result<Tp,Tq>::type;
             Poly<Tr> remainder = poly1;
             Poly<Tr> quotient;
 
@@ -638,7 +638,7 @@ namespace mpp
     template <typename Tp, typename Tq>
     auto operator+(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
     {
-        using Tr = decltype(poly1[0]+poly2[0]);
+        using Tr = op_add::result<Tp,Tq>::type;
         std::vector<Tr> coeffs;
         coeffs.reserve(std::max(poly1.size(),poly2.size()));
 
@@ -677,7 +677,7 @@ namespace mpp
     template <typename Tp, typename Tq>
     auto operator-(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
     {
-        using Tr = decltype(poly1[0]-poly2[0]);
+        using Tr = op_add::result<Tp,Tq>::type;
         std::vector<Tr> coeffs;
         coeffs.reserve(std::max(poly1.size(),poly2.size()));
 
@@ -716,7 +716,7 @@ namespace mpp
     template <typename Tp, typename Tq>
     auto operator*(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
     {
-        using Tr = decltype(poly1[0]*poly2[0]);
+        using Tr = op_add::result<Tp,Tq>::type;
         std::vector<Tr> coeffs;
         coeffs.resize(poly1.size()*poly2.size());
 
