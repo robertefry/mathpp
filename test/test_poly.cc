@@ -106,7 +106,7 @@ TEST(MPP_POLY, MATHPP)
     {
         using identity = mpp::identity<mpp::Poly<int>,mpp::op_add>;
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto const poly = mpp::Poly<int>{0};
 
@@ -120,7 +120,7 @@ TEST(MPP_POLY, MATHPP)
     {
         using identity = mpp::identity<mpp::Poly<int>,mpp::op_mul>;
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto const poly = mpp::Poly<int>{1};
 
@@ -134,7 +134,7 @@ TEST(MPP_POLY, MATHPP)
     {
         using inverse = mpp::inverse<mpp::Poly<int>,mpp::op_add>;
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto const poly = mpp::Poly<int>{-1,-2,-3};
 
@@ -152,12 +152,12 @@ TEST(MPP_POLY, MATHPP)
         // Polynomials do not have multiplicative inverses
         using inverse = mpp::inverse<mpp::Poly<int>,mpp::op_mul>;
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::none);
+        EXPECT_TRUE(has == mpp::logic::none);
     }
     {
         using absolute = mpp::absolute<mpp::Poly<int>,op_add>;
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto const poly = mpp::Poly<int>{1,2,3};
 
@@ -175,12 +175,12 @@ TEST(MPP_POLY, MATHPP)
         // Polynomials do not have multiplicative absolutes
         using absolute = mpp::absolute<mpp::Poly<int>,mpp::op_mul>;
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::none);
+        EXPECT_TRUE(has == mpp::logic::none);
     }
     {
         using modulo = mpp::modulo<mpp::Poly<int>,mpp::Poly<int>>;
         auto has = modulo::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         // convolutional polynomials Z[x]\(x^3-1)
         {
@@ -219,7 +219,7 @@ TEST(MPP_POLY, MATHPP)
     {
         using division = mpp::division<mpp::Poly<int>,mpp::Poly<int>>;
         auto has = division::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto const poly_a = mpp::Poly<int>{2,5,7,6};
         auto const poly_b = mpp::Poly<int>{1,2,3};

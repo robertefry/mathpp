@@ -13,7 +13,7 @@ TEST(MATHPP, PRIMITIVE_IDENTITY)
         using identity = mpp::identity<Tp,op_add>;
 
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto ident = identity::get();
         EXPECT_EQ(ident,0);
@@ -23,7 +23,7 @@ TEST(MATHPP, PRIMITIVE_IDENTITY)
         using identity = mpp::identity<Tp,op_add>;
 
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto ident = identity::get();
         EXPECT_EQ(ident,0);
@@ -33,7 +33,7 @@ TEST(MATHPP, PRIMITIVE_IDENTITY)
         using identity = mpp::identity<Tp,op_add>;
 
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto ident = identity::get();
         EXPECT_EQ(ident,0);
@@ -43,7 +43,7 @@ TEST(MATHPP, PRIMITIVE_IDENTITY)
         using identity = mpp::identity<Tp,op_mul>;
 
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto ident = identity::get();
         EXPECT_EQ(ident,1);
@@ -53,7 +53,7 @@ TEST(MATHPP, PRIMITIVE_IDENTITY)
         using identity = mpp::identity<Tp,op_mul>;
 
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto ident = identity::get();
         EXPECT_EQ(ident,1);
@@ -63,7 +63,7 @@ TEST(MATHPP, PRIMITIVE_IDENTITY)
         using identity = mpp::identity<Tp,op_mul>;
 
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto ident = identity::get();
         EXPECT_EQ(ident,1);
@@ -78,7 +78,7 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
         using inverse = mpp::inverse<Tp,op_add>;
 
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::none);
+        EXPECT_TRUE(has == mpp::logic::none);
     }
     {
         using Tp = signed;
@@ -86,7 +86,7 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
         Tp value = -10;
 
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = inverse::can(Tp{});
         EXPECT_TRUE(can);
@@ -103,7 +103,7 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
         Tp value = -10;
 
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = inverse::can(Tp{});
         EXPECT_TRUE(can);
@@ -120,7 +120,7 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
         using inverse = mpp::inverse<Tp,op_mul>;
 
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::none);
+        EXPECT_TRUE(has == mpp::logic::none);
     }
     {
         // The signed integers do not have multiplicative inverses
@@ -128,7 +128,7 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
         using inverse = mpp::inverse<Tp,op_mul>;
 
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::none);
+        EXPECT_TRUE(has == mpp::logic::none);
     }
     {
         using Tp = float;
@@ -136,7 +136,7 @@ TEST(MATHPP, PRIMITIVE_INVERSE)
         Tp value = -10;
 
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = inverse::can(Tp{});
         EXPECT_TRUE(can);
@@ -158,7 +158,7 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         Tp value = -10;
 
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = absolute::can(Tp{});
         EXPECT_TRUE(can);
@@ -175,7 +175,7 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         Tp value = -10;
 
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = absolute::can(Tp{});
         EXPECT_TRUE(can);
@@ -192,7 +192,7 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         Tp value = -10;
 
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = absolute::can(Tp{});
         EXPECT_TRUE(can);
@@ -209,7 +209,7 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         using absolute = mpp::absolute<Tp,op_mul>;
 
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::none);
+        EXPECT_TRUE(has == mpp::logic::none);
     }
     {
         /* The signed integers do not have multiplicative inverses */
@@ -217,7 +217,7 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         using absolute = mpp::absolute<Tp,op_mul>;
 
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::none);
+        EXPECT_TRUE(has == mpp::logic::none);
     }
     {
         using Tp = float;
@@ -225,7 +225,7 @@ TEST(MATHPP, PRIMITIVE_ABSOLUTE)
         Tp value = -0.1f;
 
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = absolute::can(Tp{});
         EXPECT_TRUE(can);
@@ -246,7 +246,7 @@ TEST(MATHPP, PRIMITIVE_MODULO)
         Tp value = 10, mod = 7;
 
         auto has = modulo::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = modulo::can(Tp{},Tp{});
         EXPECT_TRUE(can);
@@ -260,7 +260,7 @@ TEST(MATHPP, PRIMITIVE_MODULO)
         Tp value = 10, mod = 7;
 
         auto has = modulo::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = modulo::can(Tp{},Tp{});
         EXPECT_TRUE(can);
@@ -274,7 +274,7 @@ TEST(MATHPP, PRIMITIVE_MODULO)
         Tp value = -10, mod = 7;
 
         auto has = modulo::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = modulo::can(Tp{},Tp{});
         EXPECT_TRUE(can);
@@ -288,7 +288,7 @@ TEST(MATHPP, PRIMITIVE_MODULO)
         Tp value = 10, mod = 7;
 
         auto has = modulo::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = modulo::can(Tp{},Tp{});
         EXPECT_TRUE(can);
@@ -302,7 +302,7 @@ TEST(MATHPP, PRIMITIVE_MODULO)
         Tp value = -10, mod = 7;
 
         auto has = modulo::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto can = modulo::can(Tp{},Tp{});
         EXPECT_TRUE(can);

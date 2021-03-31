@@ -141,7 +141,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Poly<Tp> const&)
         {
@@ -168,7 +168,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Poly<Tp> const&, Tq const&)
         {
@@ -190,7 +190,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Poly<Tp> const&, Poly<Tq> const&)
         {
@@ -224,7 +224,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Poly<Tp> const&, Tq const&)
         {
@@ -246,7 +246,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Poly<Tp> const&, Poly<Tq> const&)
         {

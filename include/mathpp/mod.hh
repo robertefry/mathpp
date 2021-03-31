@@ -114,7 +114,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Mod<Tp> const&)
         {
@@ -135,7 +135,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::some;
+            return logic::some;
         }
         constexpr static bool can(Mod<Tp> const& e)
         {
@@ -204,7 +204,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Mod<Tp> const&, Mod<Tq> const&)
         {

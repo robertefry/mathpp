@@ -39,8 +39,8 @@ namespace mpp
      * All helpers should have the following functions, where appropriate.
      *  `has`   - Determines if possible for the template parameters.
      *  `can`   - Determines if possible for an argument of template type.
-     *  `get`   - Returns the property.
-     *  `make`  - Sets an argument to the property.
+     *  `get`   - Returns the property, if & when appropriate, and throws.
+     *  `make`  - Sets to the property, if & when appropriate, and throws.
      */
 
     template <typename Tp, typename Op>
@@ -74,7 +74,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::none;
+            return logic::none;
         }
     };
 
@@ -85,7 +85,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::none;
+            return logic::none;
         }
         constexpr static bool can(Tp const&)
         {
@@ -100,7 +100,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::none;
+            return logic::none;
         }
         constexpr static bool can(Tp const&)
         {
@@ -115,7 +115,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::none;
+            return logic::none;
         }
         constexpr static bool can(Tp const&, Tq const&)
         {
@@ -130,7 +130,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::none;
+            return logic::none;
         }
         constexpr static bool can(Tp const&, Tq const&)
         {
@@ -155,7 +155,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         static Tp get()
         {
@@ -173,7 +173,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         static Tp get()
         {
@@ -193,7 +193,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Tp const&)
         {
@@ -215,7 +215,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Tp const&)
         {
@@ -239,7 +239,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Tp const&)
         {
@@ -261,7 +261,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Tp const&)
         {
@@ -286,7 +286,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Tp const&, Tq const&)
         {
@@ -311,7 +311,7 @@ namespace mpp
     {
         constexpr static tristate has()
         {
-            return tristate::all;
+            return logic::all;
         }
         constexpr static bool can(Tp const&, Tq const&)
         {

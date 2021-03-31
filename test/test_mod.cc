@@ -78,7 +78,7 @@ TEST(MPP_MOD, MATHPP)
     {
         using identity = mpp::identity<mpp::Mod<int>,op_add>;
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto mod1 = identity::get(7); // 0  (mod 7)
         EXPECT_EQ(mod1.value(), 0);
@@ -90,7 +90,7 @@ TEST(MPP_MOD, MATHPP)
     {
         using identity = mpp::identity<mpp::Mod<int>,op_mul>;
         auto has = identity::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto mod1 = identity::get(7); // 1  (mod 7)
         EXPECT_EQ(mod1.value(), 1);
@@ -102,7 +102,7 @@ TEST(MPP_MOD, MATHPP)
     {
         using inverse = mpp::inverse<mpp::Mod<int>,op_add>;
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto mod1 = mpp::Mod<int>{7,5};
         auto can = inverse::can(mod1);
@@ -117,7 +117,7 @@ TEST(MPP_MOD, MATHPP)
     {
         using inverse = mpp::inverse<mpp::Mod<int>,op_mul>;
         auto has = inverse::has();
-        EXPECT_TRUE(has == mpp::tristate::some);
+        EXPECT_TRUE(has == mpp::logic::some);
 
         // 4 (mod 8) doesn't have a multiplicative inverse because `gcd(4,8)!=1`
         auto mod1 = mpp::Mod<int>{8,4};
@@ -139,7 +139,7 @@ TEST(MPP_MOD, MATHPP)
         // The modular numbers are their own additive absolutes
         using absolute = mpp::absolute<mpp::Mod<int>,op_add>;
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto mod1 = mpp::Mod<int>{7,4};
         auto can = absolute::can(mod1);
@@ -154,7 +154,7 @@ TEST(MPP_MOD, MATHPP)
     {
         using absolute = mpp::absolute<mpp::Mod<float>,op_mul>;
         auto has = absolute::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto mod1 = mpp::Mod<float>{7,0.25f};
         auto can = absolute::can(mod1);
@@ -172,7 +172,7 @@ TEST(MPP_MOD, MATHPP)
     {
         using division = mpp::division<mpp::Mod<int>,mpp::Mod<int>>;
         auto has = division::has();
-        EXPECT_TRUE(has == mpp::tristate::all);
+        EXPECT_TRUE(has == mpp::logic::all);
 
         auto const mod_a = mpp::Mod<int>{12,11};
         auto const mod_b = mpp::Mod<int>{8,2};
