@@ -155,28 +155,6 @@ namespace mpp
         }
     };
 
-    template <typename Tp, typename Tq>
-        requires std::is_convertible<Tq,Tp>::value
-    struct division<Mod<Tp>,Mod<Tq>>
-    {
-        constexpr static tristate has()
-        {
-            return division<Tp,Tq>::has();
-        }
-        constexpr static bool can(Mod<Tp> const& a, Mod<Tq> const& b)
-        {
-            return division<Tp,Tq>::can(a.value(),b.value());
-        }
-        static auto get(Mod<Tp> const& a, Mod<Tq> const& b)
-        {
-            auto const d = gcd<Tp>(a.modulus(),b.modulus());
-            auto [r,s] = division<Tp,Tq>::get(a.value(),b.value());
-
-            using Tr = decltype(r); using Ts = decltype(s);
-            return std::make_tuple(Mod<Tr>{d,r},Mod<Ts>{d,s});
-        }
-    };
-
 } // namespace mpp
 
 /* ************************************************************************** */

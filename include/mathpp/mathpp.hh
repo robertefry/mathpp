@@ -275,6 +275,28 @@ namespace mpp
         }
     };
 
+    // division
+
+    template <typename Tp, typename Tq>
+        requires requires (Tp x, Tq y) { x - (x / y) * y; }
+    struct division<Tp,Tq>
+    {
+        constexpr static tristate has()
+        {
+            return logic::all;
+        }
+        constexpr static bool can(Tp const&, Tq const&)
+        {
+            return true;
+        }
+        static auto get(Tp const& dividend, Tq const& divisor)
+        {
+            auto s = dividend / divisor;
+            auto r = dividend - s * divisor;
+            return std::make_tuple(r,s);
+        }
+    };
+
 } // namespace mpp
 
 /* ************************************************************************** */
@@ -390,29 +412,6 @@ namespace mpp
         static Tp& make(Tp& e, Tq n)
         {
             return e = get(e,n);
-        }
-    };
-
-    // division
-
-    template <typename Tp, typename Tq>
-        requires std::is_arithmetic<Tp>::value
-            && std::is_arithmetic<Tq>::value
-    struct division<Tp,Tq>
-    {
-        constexpr static tristate has()
-        {
-            return logic::all;
-        }
-        constexpr static bool can(Tp const&, Tq const&)
-        {
-            return true;
-        }
-        static auto get(Tp const& dividend, Tq const& divisor)
-        {
-            auto s = dividend / divisor;
-            auto r = dividend - s * divisor;
-            return std::make_tuple(r,s);
         }
     };
 

@@ -109,28 +109,6 @@ namespace mpp
 
     template <typename Tp, typename Tq>
         requires std::is_convertible<Tq,Tp>::value
-    struct division<Poly<Tp>,Tq>
-    {
-        constexpr static tristate has()
-        {
-            return logic::all;
-        }
-        constexpr static bool can(Poly<Tp> const&, Tq const&)
-        {
-            return true;
-        }
-        static Poly<Tp> get(Poly<Tp> const& e, Tq const& c)
-        {
-            return e / c;
-        }
-        static Poly<Tp>& make(Poly<Tp>& e, Tq const& c)
-        {
-            return e /= c;
-        }
-    };
-
-    template <typename Tp, typename Tq>
-        requires std::is_convertible<Tq,Tp>::value
     struct division<Poly<Tp>,Poly<Tq>>
     {
         constexpr static tristate has()
