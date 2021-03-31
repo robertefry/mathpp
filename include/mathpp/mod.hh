@@ -91,6 +91,8 @@ namespace mpp
 namespace mpp
 {
 
+    // identity
+
     template <typename Tp, typename Op>
     struct identity<Mod<Tp>,Op>
     {
@@ -108,6 +110,8 @@ namespace mpp
             return e = identity<Tp,Op>::get();
         }
     };
+
+    // inverse
 
     template <typename Tp>
     struct inverse<Mod<Tp>,op_mul>
@@ -133,6 +137,8 @@ namespace mpp
             return e = get(e);
         }
     };
+
+    // absolute
 
     template <typename Tp, typename Op>
     struct absolute<Mod<Tp>,Op>
