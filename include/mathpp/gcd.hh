@@ -15,10 +15,10 @@ namespace mpp
 {
 
     template <typename Tp>
-    Tp gcd(Tp const& a, Tp const& b);
+    constexpr Tp gcd(Tp const& a, Tp const& b);
 
     template <typename Tp>
-    std::tuple<Tp,Tp> gcd_extended(Tp const& a, Tp const& b);
+    constexpr std::tuple<Tp,Tp> gcd_extended(Tp const& a, Tp const& b);
 
 } // namespace mpp
 
@@ -30,7 +30,7 @@ namespace mpp
 {
 
     template <typename Tp>
-    Tp gcd(Tp const& a, Tp const& b)
+    constexpr Tp gcd(Tp const& a, Tp const& b)
     {
         if (a < b) return gcd(b,a);
 
@@ -45,7 +45,7 @@ namespace mpp
     }
 
     template <typename Tp>
-    std::tuple<Tp,Tp> gcd_extended(Tp const& a, Tp const& b)
+    constexpr std::tuple<Tp,Tp> gcd_extended(Tp const& a, Tp const& b)
     {
         if (a < b)
         {
