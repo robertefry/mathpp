@@ -134,52 +134,6 @@ namespace mpp
         }
     };
 
-    // modulo
-
-    template <typename Tp, typename Tq>
-        requires std::is_convertible<Tq,Poly<Tp>>::value
-    struct modulo<Poly<Tp>,Tq>
-    {
-        constexpr static tristate has()
-        {
-            return logic::all;
-        }
-        constexpr static bool can(Poly<Tp> const&, Tq const&)
-        {
-            return true;
-        }
-        static Poly<Tp> get(Poly<Tp> const& e, Tq const& n)
-        {
-            return e % n;
-        }
-        static Poly<Tp>& make(Poly<Tp>& e, Tq const& n)
-        {
-            return e %= n;
-        }
-    };
-
-    template <typename Tp, typename Tq>
-        requires std::is_convertible<Tq,Tp>::value
-    struct modulo<Poly<Tp>,Poly<Tq>>
-    {
-        constexpr static tristate has()
-        {
-            return logic::all;
-        }
-        constexpr static bool can(Poly<Tp> const&, Poly<Tq> const&)
-        {
-            return true;
-        }
-        static Poly<Tp> get(Poly<Tp> const& e, Poly<Tq> const& n)
-        {
-            return std::get<0>(division<Poly<Tp>,Poly<Tq>>::get(e,n));
-        }
-        static Poly<Tp>& make(Poly<Tp>& e, Poly<Tq> const& n)
-        {
-            return e = get(e,n);
-        }
-    };
-
     // division
 
     template <typename Tp, typename Tq>

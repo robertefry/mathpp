@@ -200,6 +200,31 @@ namespace mpp
         }
     };
 
+    // modulo
+
+    template <typename Tp, typename Tq>
+        requires (!std::is_arithmetic<Tp>::value)
+            && requires (Tp e, Tp n) { e % n; }
+    struct modulo<Tp,Tq>
+    {
+        constexpr static tristate has()
+        {
+            return logic::all;
+        }
+        constexpr static bool can(Tp const&, Tq const&)
+        {
+            return true;
+        }
+        static auto get(Tp const& e, Tq const& n)
+        {
+            return e % n;
+        }
+        static auto& make(Tp& e, Tq const& n)
+        {
+            return e %= n;
+        }
+    };
+
 } // namespace mpp
 
 /* ************************************************************************** */

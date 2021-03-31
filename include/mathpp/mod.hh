@@ -178,24 +178,6 @@ namespace mpp
 
     template <typename Tp, typename Tq>
         requires std::is_convertible<Tq,Tp>::value
-    struct modulo<Mod<Tp>,Mod<Tq>>
-    {
-        constexpr static tristate has()
-        {
-            return logic::all;
-        }
-        constexpr static bool can(Mod<Tp> const&, Mod<Tq> const&)
-        {
-            return true;
-        }
-        static Mod<Tp> get(Mod<Tp> const& e, Mod<Tq> const& n)
-        {
-            return Mod<Tp>{n.value(),e.value()};
-        }
-    };
-
-    template <typename Tp, typename Tq>
-        requires std::is_convertible<Tq,Tp>::value
     struct division<Mod<Tp>,Mod<Tq>>
     {
         constexpr static tristate has()
