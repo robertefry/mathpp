@@ -62,7 +62,7 @@ namespace mpp
 
         while (rn[1] != identity<Tp,op_add>::get())
         {
-            Tp const qm = rn[0] / rn[1];
+            Tp const qm = std::get<1>(division<Tp,Tp>::get(rn[0],rn[1]));
             sn[0] = {
                 std::get<0>(sn[0]) - std::get<0>(sn[1]) * qm,
                 std::get<1>(sn[0]) - std::get<1>(sn[1]) * qm,
