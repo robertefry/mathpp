@@ -70,8 +70,6 @@ namespace mpp
         template <typename Tq>
         Poly<Tp>& operator*=(Poly<Tq> const&);
         template <typename Tq>
-        Poly<Tp>& operator/=(Poly<Tq> const&);
-        template <typename Tq>
         Poly<Tp>& operator%=(Poly<Tq> const&);
 
     protected:
@@ -440,24 +438,6 @@ namespace mpp
 
     template <typename Tp>
     template <typename Tq>
-    Poly<Tp>& Poly<Tp>::operator/=(Poly<Tq> const& other)
-    {
-        Poly<Tp> quotient;
-
-        using abs = absolute<Poly<Tp>,op_add>;
-        while (abs::get(*this) >= abs::get(other))
-        {
-            auto const coeff = coeffs().back() / other.coeffs().back();
-            auto const power = order() - other.order();
-            auto const term = Poly<Tp>{coeff} <<= power;
-            quotient += term;
-            *this -= term * other;
-        }
-        return *this = std::move(quotient);
-    }
-
-    template <typename Tp>
-    template <typename Tq>
     Poly<Tp>& Poly<Tp>::operator%=(Poly<Tq> const& other)
     {
         using abs = absolute<Poly<Tp>,op_add>;
@@ -675,13 +655,6 @@ namespace mpp
             coeffs.push_back(c*coeff);
         }
         return Poly<Tp>{coeffs};
-    }
-
-    template <typename Tp, typename Tq>
-    auto operator/(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
-    {
-        using division = division<Poly<Tp>,Poly<Tq>>;
-        return std::get<1>(division::get(poly1,poly2));
     }
 
     template <typename Tp>

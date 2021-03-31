@@ -347,12 +347,6 @@ TEST(MPP_POLY, MATH_SELF)
     {
         auto poly1 = mpp::Poly<int>{2,5,7,6};
         auto poly2 = mpp::Poly<int>{1,2,3};
-        auto poly3 = mpp::Poly<int>{1,2};
-        EXPECT_TRUE((poly1 /= poly2) == poly3);
-    }
-    {
-        auto poly1 = mpp::Poly<int>{2,5,7,6};
-        auto poly2 = mpp::Poly<int>{1,2,3};
         auto poly3 = mpp::Poly<int>{1,1};
         EXPECT_TRUE((poly1 %= poly2) == poly3);
     }
@@ -389,12 +383,6 @@ TEST(MPP_POLY, MATH_EXTRA)
         auto poly3 = mpp::Poly<float>{0.0f,10.0f,7.0f,1.0f};    // 10x+7x^2+x^3
         auto poly4 = poly1 * poly2;
         EXPECT_TRUE(poly3 == poly4);
-    }
-    {
-        auto poly1 = mpp::Poly<int>{2,5,7,6};
-        auto poly2 = mpp::Poly<int>{1,2,3};
-        auto poly3 = mpp::Poly<int>{1,2};
-        EXPECT_TRUE((poly1 / poly2) == poly3);
     }
     {
         auto poly1 = mpp::Poly<int>{2,5,7,6};
