@@ -123,12 +123,13 @@ TEST(MPP_VECTOR, MATHPP)
         EXPECT_TRUE(has == logic::none);
     }
     {
+        // Vectors are not totally-ordered, so don't have absolutes
         using absolute = absolute<Vector<int,3>,op_add>;
         auto has = absolute::has();
         EXPECT_TRUE(has == logic::none);
     }
     {
-        // Vectors do not have multiplicative absolutes
+        // Vectors are not totally-ordered, so don't have absolutes
         using absolute = absolute<Vector<int,3>,op_mul>;
         auto has = absolute::has();
         EXPECT_TRUE(has == logic::none);
@@ -251,15 +252,5 @@ TEST(MPP_VECTOR, MATH_EXTRA)
         auto elems = std::vector<int>{1,0,1};
         auto vec = vec1 % scalar;
         EXPECT_EQ(vec.elements(), elems);
-    }
-}
-
-TEST(MPP_VECTOR, COVECTOR)
-{
-    auto const vec = Vector<int,3>{1,2,3};
-    {
-        auto const covec = CoVector<int,3>{1,2,3};
-        auto scalar = covec * vec;
-        EXPECT_EQ(scalar, 14);
     }
 }
