@@ -5,6 +5,7 @@
 #include "mathpp/mathpp.hh"
 
 #include <vector>
+#include <span>
 
 /* ************************************************************************** */
 // Definitions
@@ -19,17 +20,18 @@ namespace mpp
     public:
         explicit VectorBase();
         explicit VectorBase(Tp const&);
+        explicit VectorBase(std::span<Tp,Nm> const&);
         virtual ~VectorBase() = default;
 
         template <typename... Args>
             requires (std::conjunction<std::is_convertible<Args,Tp>...>::value)
-        VectorBase(Args const&... args)
-            requires (sizeof...(args) == Nm);
+                && (sizeof...(Args) == Nm)
+        VectorBase(Args const&... args);
 
         template <typename... Args>
             requires (std::conjunction<std::is_same<Args,Tp>...>::value)
-        VectorBase(Args&&... args)
-            requires (sizeof...(args) == Nm);
+                && (sizeof...(Args) == Nm)
+        VectorBase(Args&&... args);
 
         template <typename Tq>
             requires (std::is_convertible<Tq,Tp>::value)
@@ -49,8 +51,8 @@ namespace mpp
 
         template <typename... Args>
             requires (std::conjunction<std::is_assignable<Args,Tp>...>::value)
-        void assign(Args&&... args)
-            requires (sizeof...(args) == Nm);
+                && (sizeof...(Args) == Nm)
+        void assign(Args&&... args);
 
         auto operator[](size_t i) const -> Tp const& { return m_Elements[i]; }
         auto operator[](size_t i) -> Tp& { return m_Elements[i]; }
@@ -152,10 +154,16 @@ namespace mpp
     }
 
     template <typename Tp, size_t Nm, bool Vh>
+    VectorBase<Tp,Nm,Vh>::VectorBase(std::span<Tp,Nm> const& span)
+        : m_Elements(span.begin(),span.end())
+    {
+    }
+
+    template <typename Tp, size_t Nm, bool Vh>
     template <typename... Args>
         requires (std::conjunction<std::is_convertible<Args,Tp>...>::value)
+            && (sizeof...(Args) == Nm)
     VectorBase<Tp,Nm,Vh>::VectorBase(Args const&... args)
-        requires (sizeof...(args) == Nm)
         : m_Elements{static_cast<Tp>(args)...}
     {
     }
@@ -163,8 +171,8 @@ namespace mpp
     template <typename Tp, size_t Nm, bool Vh>
     template <typename... Args>
         requires (std::conjunction<std::is_same<Args,Tp>...>::value)
+            && (sizeof...(Args) == Nm)
     VectorBase<Tp,Nm,Vh>::VectorBase(Args&&... args)
-        requires (sizeof...(args) == Nm)
         : m_Elements{std::forward<Args>(args)...}
     {
     }
@@ -191,6 +199,7 @@ namespace mpp
         {
             m_Elements[i] = other[i];
         }
+        return *this;
     }
 
     template <typename Tp, size_t Nm, bool Vh>
@@ -211,8 +220,8 @@ namespace mpp
     template <typename Tp, size_t Nm, bool Vh>
     template <typename... Args>
         requires (std::conjunction<std::is_assignable<Args,Tp>...>::value)
+            && (sizeof...(Args) == Nm)
     void VectorBase<Tp,Nm,Vh>::assign(Args&&... args)
-        requires (sizeof...(args) == Nm)
     {
         m_Elements = {std::forward<Args>(args)...};
     }
