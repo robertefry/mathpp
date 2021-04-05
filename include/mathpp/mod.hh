@@ -114,6 +114,27 @@ namespace mpp
     // inverse
 
     template <typename Tp>
+    struct inverse<Mod<Tp>,op_add>
+    {
+        constexpr static tristate has()
+        {
+            return inverse<Tp,op_add>::has();
+        }
+        constexpr static bool can(Mod<Tp> const&)
+        {
+            return has() != logic::none;
+        }
+        static Mod<Tp> get(Mod<Tp> const& e)
+        {
+            return -e;
+        }
+        static Mod<Tp>& make(Mod<Tp>& e)
+        {
+            return e = get(e);
+        }
+    };
+
+    template <typename Tp>
     struct inverse<Mod<Tp>,op_mul>
     {
         constexpr static tristate has()
@@ -126,9 +147,6 @@ namespace mpp
         }
         static Mod<Tp> get(Mod<Tp> const& e)
         {
-            if (!can(e)) {
-                throw std::runtime_error("Mod<Tp> must have gcd(val,mod)=1 for defined inverses.");
-            }
             auto [x,y] = gcd_extended(e.value(),e.modulus());
             return Mod<Tp>{e.modulus(),x};
         }

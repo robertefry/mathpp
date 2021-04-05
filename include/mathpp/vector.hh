@@ -107,6 +107,29 @@ namespace mpp
         }
     };
 
+    // inverse
+
+    template <typename Tp, size_t Nm, bool Vh>
+    struct inverse<VectorBase<Tp,Nm,Vh>,op_add>
+    {
+        constexpr static tristate has()
+        {
+            return inverse<Tp,op_add>::has();
+        }
+        constexpr static bool can(VectorBase<Tp,Nm,Vh> const&)
+        {
+            return has() != logic::none;
+        }
+        static VectorBase<Tp,Nm,Vh> get(VectorBase<Tp,Nm,Vh> const& vec)
+        {
+            return -vec;
+        }
+        static VectorBase<Tp,Nm,Vh>& make(VectorBase<Tp,Nm,Vh>& vec)
+        {
+            return vec = get(vec);
+        }
+    };
+
 } // namespace mpp
 
 /* ************************************************************************** */

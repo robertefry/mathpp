@@ -166,56 +166,6 @@ namespace mpp
 namespace mpp
 {
 
-    // inverse
-
-    template <typename Tp>
-        requires (!std::is_arithmetic<Tp>::value)
-            && (identity<Tp,op_add>::has() != logic::none)
-            && requires (Tp e) { -e; }
-    struct inverse<Tp,op_add>
-    {
-        constexpr static tristate has()
-        {
-            return identity<Tp,op_add>::has();
-        }
-        constexpr static bool can(Tp const&)
-        {
-            return true;
-        }
-        static Tp get(Tp const& e)
-        {
-            return -e;
-        }
-        static Tp& make(Tp& e)
-        {
-            return e = get(e);
-        }
-    };
-
-    template <typename Tp>
-        requires (!std::is_arithmetic<Tp>::value)
-            && (identity<Tp,op_mul>::has() != logic::none)
-            && requires (Tp e) { identity<Tp,op_mul>::get() / e; }
-    struct inverse<Tp,op_mul>
-    {
-        constexpr static tristate has()
-        {
-            return identity<Tp,op_mul>::has();
-        }
-        constexpr static bool can(Tp const& e)
-        {
-            return true;
-        }
-        static Tp get(Tp const& e)
-        {
-            return identity<Tp,op_mul>::get() / e;
-        }
-        static Tp& make(Tp& e)
-        {
-            return e = get(e);
-        }
-    };
-
     // absolute
 
     template <typename Tp, typename Op>
