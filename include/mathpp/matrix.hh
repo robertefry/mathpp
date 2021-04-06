@@ -118,12 +118,11 @@ namespace mpp
         {
             return identity<Tp,op_add>::has();
         }
-        static Matrix<Tp,Nr,Nc> const& get()
+        constexpr static Matrix<Tp,Nr,Nc> get()
         {
-            static auto const s_ident = Matrix<Tp,Nr,Nc>{identity<Tp,op_add>::get()};
-            return s_ident;
+            return Matrix<Tp,Nr,Nc>{identity<Tp,op_add>::get()};
         }
-        static Matrix<Tp,Nr,Nc>& make(Matrix<Tp,Nr,Nc>& mat)
+        constexpr static Matrix<Tp,Nr,Nc>& make(Matrix<Tp,Nr,Nc>& mat)
         {
             return mat = get();
         }
@@ -136,18 +135,15 @@ namespace mpp
         {
             return identity<Tp,op_mul>::has();
         }
-        static Matrix<Tp,Nm,Nm> const& get()
+        constexpr static Matrix<Tp,Nm,Nm> get()
         {
-            static auto const s_ident = [&]() {
-                auto mat = identity<Matrix<Tp,Nm,Nm>,op_add>::get();
-                for (size_t i = 0; i < Nm; ++i) {
-                    mat[{i,i}] = identity<Tp,op_mul>::get();
-                }
-                return mat;
-            }();
-            return s_ident;
+            auto mat = identity<Matrix<Tp,Nm,Nm>,op_add>::get();
+            for (size_t i = 0; i < Nm; ++i) {
+                mat[{i,i}] = identity<Tp,op_mul>::get();
+            }
+            return mat;
         }
-        static Matrix<Tp,Nm,Nm>& make(Matrix<Tp,Nm,Nm>& mat)
+        constexpr static Matrix<Tp,Nm,Nm>& make(Matrix<Tp,Nm,Nm>& mat)
         {
             return mat = get();
         }
@@ -167,12 +163,12 @@ namespace mpp
         {
             return true;
         }
-        static Matrix<Tp,Nr,Nc> get(Matrix<Tp,Nr,Nc> const& matrix)
+        constexpr static Matrix<Tp,Nr,Nc> get(Matrix<Tp,Nr,Nc> const& matrix)
         {
             auto const ident = identity<Matrix<Tp,Nr,Nc>,op_add>::get();
             return ident - matrix;
         }
-        static Matrix<Tp,Nr,Nc>& make(Matrix<Tp,Nr,Nc>& matrix)
+        constexpr static Matrix<Tp,Nr,Nc>& make(Matrix<Tp,Nr,Nc>& matrix)
         {
             return matrix = get(matrix);
         }
@@ -190,7 +186,7 @@ namespace mpp
         {
             return matrices::determinant(matrix) != identity<Tp,op_add>::get();
         }
-        static Matrix<Tp,Nm,Nm> get(Matrix<Tp,Nm,Nm> const& matrix)
+        constexpr static Matrix<Tp,Nm,Nm> get(Matrix<Tp,Nm,Nm> const& matrix)
         {
             Matrix<Tp,Nm,Nm> source = matrix;
             Matrix<Tp,Nm,Nm> result = identity<Matrix<Tp,Nm,Nm>,op_mul>::get();
@@ -238,7 +234,7 @@ namespace mpp
 
             return result;
         }
-        static Matrix<Tp,Nm,Nm>& make(Matrix<Tp,Nm,Nm>& matrix)
+        constexpr static Matrix<Tp,Nm,Nm>& make(Matrix<Tp,Nm,Nm>& matrix)
         {
             return matrix = get(matrix);
         }

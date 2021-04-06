@@ -184,7 +184,7 @@ namespace mpp
         {
             return has() != logic::none;
         }
-        static Tp get(Tp const& e)
+        constexpr static Tp get(Tp const& e)
         {
             if constexpr (inverse<Tp,Op>::has() != logic::none) {
                 if (e < identity<Tp,Op>::get()) {
@@ -193,7 +193,7 @@ namespace mpp
             }
             return e;
         }
-        static Tp& make(Tp& e)
+        constexpr static Tp& make(Tp& e)
         {
             if constexpr (inverse<Tp,Op>::has() != logic::none) {
                 if (e < identity<Tp,Op>::get()) {
@@ -207,8 +207,7 @@ namespace mpp
     // modulo
 
     template <typename Tp, typename Tq>
-        requires (!std::is_arithmetic<Tp>::value)
-            && requires (Tp e, Tp n) { e % n; }
+        requires requires (Tp e, Tq n) { e % n; }
     struct modulo<Tp,Tq>
     {
         constexpr static tristate has()
@@ -219,13 +218,14 @@ namespace mpp
         {
             return true;
         }
-        static auto get(Tp const& e, Tq const& n)
+        constexpr static auto get(Tp const& e, Tq const& n)
         {
-            return e % n;
+            auto const ident = identity<Tp,op_add>::get();
+            return (e < ident) ? n - (-e % n) : (e % n);
         }
-        static auto& make(Tp& e, Tq const& n)
+        constexpr static auto& make(Tp& e, Tq const& n)
         {
-            return e %= n;
+            return e = get(e,n);
         }
     };
 
@@ -243,7 +243,7 @@ namespace mpp
         {
             return true;
         }
-        static auto get(Tp const& dividend, Tq const& divisor)
+        constexpr static auto get(Tp const& dividend, Tq const& divisor)
         {
             auto s = dividend / divisor;
             auto r = dividend - s * divisor;
@@ -270,11 +270,11 @@ namespace mpp
         {
             return logic::all;
         }
-        static Tp get()
+        constexpr static Tp get()
         {
             return Tp{0};
         }
-        static Tp& make(Tp& e)
+        constexpr static Tp& make(Tp& e)
         {
             return e = get();
         }
@@ -288,11 +288,11 @@ namespace mpp
         {
             return logic::all;
         }
-        static Tp get()
+        constexpr static Tp get()
         {
             return Tp{1};
         }
-        static Tp& make(Tp& e)
+        constexpr static Tp& make(Tp& e)
         {
             return e = get();
         }
@@ -312,11 +312,11 @@ namespace mpp
         {
             return true;
         }
-        static Tp get(Tp e)
+        constexpr static Tp get(Tp e)
         {
             return -e;
         }
-        static Tp& make(Tp& e)
+        constexpr static Tp& make(Tp& e)
         {
             return e = get(e);
         }
@@ -334,11 +334,11 @@ namespace mpp
         {
             return true;
         }
-        static Tp get(Tp e)
+        constexpr static Tp get(Tp e)
         {
             return 1/e;
         }
-        static Tp& make(Tp& e)
+        constexpr static Tp& make(Tp& e)
         {
             return e = get(e);
         }
@@ -347,8 +347,8 @@ namespace mpp
     // modulo
 
     template <typename Tp, typename Tq>
-        requires std::is_arithmetic<Tp>::value
-            && std::is_arithmetic<Tq>::value
+        requires std::is_floating_point<Tp>::value
+            || std::is_floating_point<Tq>::value
     struct modulo<Tp,Tq>
     {
         constexpr static tristate has()
@@ -359,11 +359,11 @@ namespace mpp
         {
             return true;
         }
-        static Tp get(Tp e, Tq n)
+        constexpr static Tp get(Tp e, Tq n)
         {
             return (e < 0) ? n - std::fmod(-e,n) : std::fmod(e,n);
         }
-        static Tp& make(Tp& e, Tq n)
+        constexpr static Tp& make(Tp& e, Tq n)
         {
             return e = get(e,n);
         }

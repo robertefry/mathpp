@@ -98,12 +98,11 @@ namespace mpp
         {
             return identity<Tp,op_add>::has();
         }
-        static VectorBase<Tp,Nm,Vh> const& get()
+        constexpr static VectorBase<Tp,Nm,Vh> get()
         {
-            static auto const s_ident = VectorBase<Tp,Nm,Vh>{identity<Tp,op_add>::get()};
-            return s_ident;
+            return VectorBase<Tp,Nm,Vh>{identity<Tp,op_add>::get()};
         }
-        static VectorBase<Tp,Nm,Vh>& make(VectorBase<Tp,Nm,Vh>& vector)
+        constexpr static VectorBase<Tp,Nm,Vh>& make(VectorBase<Tp,Nm,Vh>& vector)
         {
             return vector = get();
         }
@@ -122,11 +121,11 @@ namespace mpp
         {
             return has() != logic::none;
         }
-        static VectorBase<Tp,Nm,Vh> get(VectorBase<Tp,Nm,Vh> const& vector)
+        constexpr static VectorBase<Tp,Nm,Vh> get(VectorBase<Tp,Nm,Vh> const& vector)
         {
             return -vector;
         }
-        static VectorBase<Tp,Nm,Vh>& make(VectorBase<Tp,Nm,Vh>& vector)
+        constexpr static VectorBase<Tp,Nm,Vh>& make(VectorBase<Tp,Nm,Vh>& vector)
         {
             return vector = get(vector);
         }

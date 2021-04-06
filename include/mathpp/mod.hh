@@ -100,12 +100,11 @@ namespace mpp
         {
             return identity<Tp,Op>::has();
         }
-        static Mod<Tp> const& get(Tp const& mod)
+        constexpr static Mod<Tp> get(Tp const& mod)
         {
-            static auto const s_ident = Mod<Tp>{mod,identity<Tp,Op>::get()};
-            return s_ident;
+            return Mod<Tp>{mod,identity<Tp,Op>::get()};
         }
-        static Mod<Tp>& make(Mod<Tp>& e)
+        constexpr static Mod<Tp>& make(Mod<Tp>& e)
         {
             return e = identity<Tp,Op>::get();
         }
@@ -124,11 +123,11 @@ namespace mpp
         {
             return has() != logic::none;
         }
-        static Mod<Tp> get(Mod<Tp> const& e)
+        constexpr static Mod<Tp> get(Mod<Tp> const& e)
         {
             return -e;
         }
-        static Mod<Tp>& make(Mod<Tp>& e)
+        constexpr static Mod<Tp>& make(Mod<Tp>& e)
         {
             return e = get(e);
         }
@@ -145,12 +144,12 @@ namespace mpp
         {
             return gcd<Tp>(e.value(),e.modulus()) == identity<Tp,op_mul>::get();
         }
-        static Mod<Tp> get(Mod<Tp> const& e)
+        constexpr static Mod<Tp> get(Mod<Tp> const& e)
         {
             auto [x,y] = gcd_extended(e.value(),e.modulus());
             return Mod<Tp>{e.modulus(),x};
         }
-        static Mod<Tp>& make(Mod<Tp>& e)
+        constexpr static Mod<Tp>& make(Mod<Tp>& e)
         {
             return e = get(e);
         }
@@ -169,11 +168,11 @@ namespace mpp
         {
             return absolute<Tp,Op>::can(e.value());
         }
-        static Mod<Tp> get(Mod<Tp> const& e)
+        constexpr static Mod<Tp> get(Mod<Tp> const& e)
         {
             return Mod<Tp>{e.modulus(),absolute<Tp,Op>::get(e.value())};
         }
-        static Mod<Tp>& make(Mod<Tp>& e)
+        constexpr static Mod<Tp>& make(Mod<Tp>& e)
         {
             return e = absolute<Tp,Op>::get(e.value());
         }

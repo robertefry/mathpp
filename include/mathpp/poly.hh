@@ -94,12 +94,11 @@ namespace mpp
         {
             return identity<Tp,Op>::has();
         }
-        static Poly<Tp> const& get()
+        constexpr static Poly<Tp> get()
         {
-            static auto const s_ident = Poly<Tp>{identity<Tp,Op>::get()};
-            return s_ident;
+            return Poly<Tp>{identity<Tp,Op>::get()};
         }
-        static Poly<Tp>& make(Poly<Tp>& poly)
+        constexpr static Poly<Tp>& make(Poly<Tp>& poly)
         {
             return poly = get();
         }
@@ -118,11 +117,11 @@ namespace mpp
         {
             return has() != logic::none;
         }
-        static Poly<Tp> get(Poly<Tp> const& e)
+        constexpr static Poly<Tp> get(Poly<Tp> const& e)
         {
             return -e;
         }
-        static Poly<Tp>& make(Poly<Tp>& e)
+        constexpr static Poly<Tp>& make(Poly<Tp>& e)
         {
             return e = get(e);
         }
@@ -141,7 +140,7 @@ namespace mpp
         {
             return true;
         }
-        static auto get(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
+        constexpr static auto get(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
         {
             using Tr = op_mul::result<Tp,Tq>::type;
             Poly<Tr> remainder = poly1;
