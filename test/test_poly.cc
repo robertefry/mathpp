@@ -399,14 +399,14 @@ TEST(MPP_POLY, GCD)
         auto poly2 = mpp::Poly<int>{1,1} * mpp::Poly<int>{2,3}; // (1+x)(2+3x)
         auto poly3 = mpp::Poly<int>{1,1};
         auto gcd = mpp::gcd(poly1,poly2);
-        EXPECT_EQ(gcd.coeffs(), poly3.coeffs());  // gcd of (1+x)(1+2x) and (1+x)(2+3x) is (1+x)
+        EXPECT_TRUE(gcd == poly3);  // gcd of (1+x)(1+2x) and (1+x)(2+3x) is (1+x)
     }
     {
         auto poly1 = mpp::Poly<int>{1,1} * mpp::Poly<int>{1,2}; // (1+x)(1+2x)
         auto poly2 = mpp::Poly<int>{1,1} * mpp::Poly<int>{2,3}; // (1+x)(2+3x)
         auto poly3 = mpp::Poly<int>{1,1};
         auto gcd = mpp::gcd(poly2,poly1);
-        EXPECT_EQ(gcd.coeffs(), poly3.coeffs());  // gcd of (1+x)(1+2x) and (1+x)(2+3x) is (1+x)
+        EXPECT_TRUE(gcd == poly3);  // gcd of (1+x)(1+2x) and (1+x)(2+3x) is (1+x)
     }
 }
 
