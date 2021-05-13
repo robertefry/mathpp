@@ -38,21 +38,29 @@ namespace mpp
         virtual void validate();
 
     public:
+        virtual void trim();
+
         virtual auto coeffs() const -> std::vector<Tp> const& { return m_Coefficients; }
-        virtual auto order() const -> size_t { return m_Coefficients.size()-1; }
+        virtual auto coeffs() -> std::vector<Tp>& { return m_Coefficients; }
         virtual auto size() const -> size_t { return m_Coefficients.size(); }
+
+        virtual auto order() const -> size_t;
+        virtual auto front() const -> Tp const& { return m_Coefficients[0]; }
+        virtual auto back() const -> Tp const& { return m_Coefficients[order()]; }
 
         virtual void swap(Poly<Tp>&);
         virtual void assign(size_t, Tp const&);
         virtual void assign(std::initializer_list<Tp>);
         virtual void assign(std::vector<Tp> const&);
         virtual void assign(std::vector<Tp>&&);
+        virtual void resize(size_t);
+        virtual void resize(size_t, Tp const&);
         virtual void zero();
 
-        virtual auto operator[](size_t i) const -> Tp const& { return m_Coefficients[i]; }
-        virtual auto operator[](size_t i) -> Tp& { return m_Coefficients[i]; }
-        virtual auto at(size_t i) const -> Tp const& { return m_Coefficients.at(i); }
-        virtual auto at(size_t i) -> Tp& { return m_Coefficients.at(i); }
+        virtual auto operator[](size_t i) const -> Tp const&;
+        virtual auto operator[](size_t i) -> Tp&;
+        virtual auto at(size_t i) const -> Tp const&;
+        virtual auto at(size_t i) -> Tp&;
 
         virtual Poly<Tp>& operator<<=(size_t);
         virtual Poly<Tp>& operator>>=(size_t);
@@ -73,7 +81,7 @@ namespace mpp
         Poly<Tp>& operator%=(Poly<Tq> const&);
 
     protected:
-        std::vector<Tp> m_Coefficients{};
+        mutable std::vector<Tp> m_Coefficients{};
     };
 
 } // namespace mpp
@@ -149,7 +157,7 @@ namespace mpp
             using abs = absolute<Poly<Tp>,op_add>;
             while (abs::get(remainder) >= abs::get(poly2))
             {
-                auto const coeff = remainder.coeffs().back() / poly2.coeffs().back();
+                auto const coeff = remainder.back() / poly2.back();
                 auto const power = remainder.order() - poly2.order();
                 auto const term = Poly<Tr>{coeff} <<= power;
                 remainder -= term * poly2;
@@ -245,10 +253,25 @@ namespace mpp
     template <typename Tp>
     void Poly<Tp>::validate()
     {
-        auto const pred = [](auto const& coeff) { return coeff != identity<Tp,op_add>::get(); };
-        auto const itr = std::find_if(m_Coefficients.rbegin(), m_Coefficients.rend(), pred);
-        m_Coefficients.erase(itr.base(), m_Coefficients.end());
         if (m_Coefficients.size() == 0) m_Coefficients.push_back(identity<Tp,op_add>::get());
+    }
+
+    template <typename Tp>
+    void Poly<Tp>::trim()
+    {
+        m_Coefficients.erase(m_Coefficients.begin()+order(),m_Coefficients.end());
+        validate();
+    }
+
+    template <typename Tp>
+    auto Poly<Tp>::order() const
+        -> size_t
+    {
+        for (size_t i = m_Coefficients.size() - 1; i < m_Coefficients.size(); --i)
+        {
+            if (m_Coefficients[i] != identity<Tp,op_add>::get()) return i;
+        }
+        return 0;
     }
 
     template <typename Tp>
@@ -288,11 +311,58 @@ namespace mpp
     }
 
     template <typename Tp>
+    void Poly<Tp>::resize(size_t size)
+    {
+        m_Coefficients.resize(size);
+        validate();
+    }
+
+    template <typename Tp>
+    void Poly<Tp>::resize(size_t size, Tp const& value)
+    {
+        m_Coefficients.resize(size,value);
+        validate();
+    }
+
+    template <typename Tp>
     void Poly<Tp>::zero()
     {
         m_Coefficients.clear();
         validate();
     }
+
+    template <typename Tp>
+    auto Poly<Tp>::operator[](size_t i) const
+        -> Tp const&
+    {
+        if (i >= m_Coefficients.size()) m_Coefficients.resize(i+1);
+        return m_Coefficients[i];
+    }
+
+    template <typename Tp>
+    auto Poly<Tp>::operator[](size_t i)
+        -> Tp&
+    {
+        if (i >= m_Coefficients.size()) m_Coefficients.resize(i+1);
+        return m_Coefficients[i];
+    }
+
+    template <typename Tp>
+    auto Poly<Tp>::at(size_t i) const
+        -> Tp const&
+    {
+        if (i >= m_Coefficients.size()) m_Coefficients.resize(i+1);
+        return m_Coefficients.at(i);
+    }
+
+    template <typename Tp>
+    auto Poly<Tp>::at(size_t i)
+        -> Tp&
+    {
+        if (i >= m_Coefficients.size()) m_Coefficients.resize(i+1);
+        return m_Coefficients.at(i);
+    }
+
 
     template <typename Tp>
     Poly<Tp>& Poly<Tp>::operator>>=(size_t n)
@@ -415,7 +485,7 @@ namespace mpp
         using abs = absolute<Poly<Tp>,op_add>;
         while (abs::get(*this) >= abs::get(other))
         {
-            auto const coeff = coeffs().back() / other.coeffs().back();
+            auto const coeff = back() / other.back();
             auto const power = order() - other.order();
             auto const term = Poly<Tp>{coeff} <<= power;
             *this -= other * term;
@@ -450,8 +520,8 @@ namespace mpp
     auto operator<=>(Poly<Tp> const& poly1, Poly<Tq> const& poly2)
         -> std::compare_three_way_result_t<Tp,Tq>
     {
-        if (poly1.order() > poly2.order()) return poly1.coeffs().back() <=> identity<Tp,op_add>::get();
-        if (poly1.order() < poly2.order()) return identity<Tp,op_add>::get() <=> poly2.coeffs().back();
+        if (poly1.order() > poly2.order()) return poly1.back() <=> identity<Tp,op_add>::get();
+        if (poly1.order() < poly2.order()) return identity<Tp,op_add>::get() <=> poly2.back();
 
         const size_t order = poly1.order();
         for (size_t i = order; i <= order; --i)
