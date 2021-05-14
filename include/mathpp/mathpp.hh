@@ -221,7 +221,8 @@ namespace mpp
         constexpr static auto get(Tp const& e, Tq const& n)
         {
             auto const ident = identity<Tp,op_add>::get();
-            return (e < ident) ? n - (-e % n) : (e % n);
+            auto result = e % n;
+            return (result < ident) ? result += n : result;
         }
         constexpr static auto& make(Tp& e, Tq const& n)
         {
@@ -361,7 +362,8 @@ namespace mpp
         }
         constexpr static Tp get(Tp e, Tq n)
         {
-            return (e < 0) ? n - std::fmod(-e,n) : std::fmod(e,n);
+            auto result = std::fmod(e,n);
+            return (result < 0) ? result += n : result;
         }
         constexpr static Tp& make(Tp& e, Tq n)
         {
